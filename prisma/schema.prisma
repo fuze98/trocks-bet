@@ -1,0 +1,105 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id             String    @id @default(cuid())
+  username       String    @unique
+  passwordHash   String
+  balance        Float     @default(0.0) // Social Credit Capital
+  isAdmin        Boolean   @default(false)
+  isTemporaryPwd Boolean   @default(false)
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+  bets           Bet[]
+}
+
+model Sport {
+  id          String   @id @default(cuid())
+  name        String   @unique
+  leagues     League[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model League {
+  id          String   @id @default(cuid())
+  name        String
+  sportId     String
+  sport       Sport    @relation(fields: [sportId], references: [id], onDelete: Cascade)
+  matches     Match[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@unique([name, sportId])
+}
+
+model Match {
+  id                 String    @id @default(cuid())
+  name               String    // e.g., "Team A vs Team B"
+  leagueId           String
+  league             League    @relation(fields: [leagueId], references: [id], onDelete: Cascade)
+  startTime          DateTime
+  expectedResultTime DateTime?
+  status             String    @default("Scheduled") // Scheduled, In Progress, Completed
+  markets            Market[]
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
+}
+
+model Market {
+  id               String          @id @default(cuid())
+  name             String          // e.g., "Moneyline", "Over/Under 45.5"
+  matchId          String
+  match            Match           @relation(fields: [matchId], references: [id], onDelete: Cascade)
+  allowOnlySingles Boolean         @default(false)
+  status           String          @default("Open") // Open, Graded
+  outcomes         MarketOutcome[]
+  createdAt        DateTime        @default(now())
+  updatedAt        DateTime        @updatedAt
+}
+
+model MarketOutcome {
+  id          String   @id @default(cuid())
+  name        String   // e.g., "Team A", "Over"
+  marketId    String
+  market      Market   @relation(fields: [marketId], references: [id], onDelete: Cascade)
+  oddsDecimal Float
+  status      String   @default("Pending") // Pending, Won, Lost, Push
+  betLegs     BetLeg[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Bet {
+  id           String   @id @default(cuid())
+  userId       String
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  amount       Float
+  totalOdds    Float
+  potentialWin Float
+  status       String   @default("Pending") // Pending, Won, Lost, Push
+  legs         BetLeg[]
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model BetLeg {
+  id              String        @id @default(cuid())
+  betId           String
+  bet             Bet           @relation(fields: [betId], references: [id], onDelete: Cascade)
+  marketOutcomeId String
+  marketOutcome   MarketOutcome @relation(fields: [marketOutcomeId], references: [id], onDelete: Restrict)
+  oddsDecimal     Float         // Odds at the time the bet was placed
+  status          String        @default("Pending") // Pending, Won, Lost, Push
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+}
