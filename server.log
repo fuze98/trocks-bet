@@ -1,11 +1,112 @@
 
-> my-app@0.1.0 start
-> next start
+> my-app@0.1.0 dev
+> next dev
 
   ▲ Next.js 14.2.3
   - Local:        http://localhost:3000
 
  ✓ Starting...
- ✓ Ready in 435ms
+Attention: Next.js now collects completely anonymous telemetry regarding usage.
+This information is used to shape Next.js' roadmap and prioritize features.
+You can learn more, including how to opt-out if you'd not like to participate in this anonymous program, by visiting the following URL:
+https://nextjs.org/telemetry
+
+ ✓ Ready in 3.3s
+ ○ Compiling / ...
+ ✓ Compiled / in 10.7s (1463 modules)
+ ⨯ PrismaClientInitializationError:
+Invalid `prisma.sport.findMany()` invocation:
+
+
+Can't reach database server at `localhost:5432`
+
+Please make sure your database server is running at `localhost:5432`.
+    at async RootLayout (./src/app/layout.tsx:23:20)
+digest: "1560533431"
+ ⨯ PrismaClientInitializationError:
+Invalid `prisma.match.findMany()` invocation:
+
+
+Can't reach database server at `localhost:5432`
+
+Please make sure your database server is running at `localhost:5432`.
+    at async Home (./src/app/page.tsx:18:21)
+digest: "660374884"
+ ⨯ PrismaClientInitializationError:
+Invalid `prisma.sport.findMany()` invocation:
+
+
+Can't reach database server at `localhost:5432`
+
+Please make sure your database server is running at `localhost:5432`.
+    at async RootLayout (./src/app/layout.tsx:23:20)
+digest: "1560533431"
+ GET / 500 in 11793ms
+ ✓ Compiled in 1033ms (722 modules)
+ ⨯ PrismaClientInitializationError:
+Invalid `prisma.match.findMany()` invocation:
+
+
+Can't reach database server at `localhost:5432`
+
+Please make sure your database server is running at `localhost:5432`.
+    at async Home (./src/app/page.tsx:18:21)
+digest: "660374884"
+ ⨯ PrismaClientInitializationError:
+Invalid `prisma.sport.findMany()` invocation:
+
+
+Can't reach database server at `localhost:5432`
+
+Please make sure your database server is running at `localhost:5432`.
+    at async RootLayout (./src/app/layout.tsx:23:20)
+digest: "1560533431"
+ ⨯ PrismaClientInitializationError:
+Invalid `prisma.sport.findMany()` invocation:
+
+
+Can't reach database server at `localhost:5432`
+
+Please make sure your database server is running at `localhost:5432`.
+    at async RootLayout (./src/app/layout.tsx:23:20)
+digest: "1560533431"
+ GET / 500 in 96ms
+ ⨯ PrismaClientInitializationError:
+Invalid `prisma.match.findMany()` invocation:
+
+
+Can't reach database server at `localhost:5432`
+
+Please make sure your database server is running at `localhost:5432`.
+    at async Home (./src/app/page.tsx:18:21)
+digest: "660374884"
+ ⨯ PrismaClientInitializationError:
+Invalid `prisma.sport.findMany()` invocation:
+
+
+Can't reach database server at `localhost:5432`
+
+Please make sure your database server is running at `localhost:5432`.
+    at async RootLayout (./src/app/layout.tsx:23:20)
+digest: "1560533431"
+ ⨯ PrismaClientInitializationError:
+Invalid `prisma.sport.findMany()` invocation:
+
+
+Can't reach database server at `localhost:5432`
+
+Please make sure your database server is running at `localhost:5432`.
+    at async RootLayout (./src/app/layout.tsx:23:20)
+digest: "1560533431"
+ GET / 500 in 93ms
+   Reload env: .env
+ ✓ Compiled in 729ms (1449 modules)
+ GET / 200 in 507ms
+ ○ Compiling /api/auth/[...nextauth] ...
+ ✓ Compiled /api/auth/[...nextauth] in 1848ms (977 modules)
 [next-auth][warn][NEXTAUTH_URL]
 https://next-auth.js.org/warnings#nextauth_url
+[next-auth][warn][NO_SECRET]
+https://next-auth.js.org/warnings#no_secret
+ GET /api/auth/session 200 in 3074ms
+ GET /api/auth/session 200 in 23ms
