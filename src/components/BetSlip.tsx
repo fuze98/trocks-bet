@@ -3,7 +3,7 @@
 import { useBetSlip } from "@/store/useBetSlip";
 import { formatOdds } from "@/lib/utils";
 import { useSession } from "next-auth/react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { ChevronUp, ChevronDown, Trash2 } from "lucide-react";
@@ -14,7 +14,12 @@ export function BetSlip() {
   const [isPlacing, setIsPlacing] = useState(false);
   const [error, setError] = useState("");
   const [isMobileExpanded, setIsMobileExpanded] = useState(false);
+  const [isMounted, setIsMounted] = useState(false);
   const router = useRouter();
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   // Validate parlay limits
   const hasSinglesOnly = legs.some(l => l.allowOnlySingles);
@@ -64,6 +69,8 @@ export function BetSlip() {
       setIsPlacing(false);
     }
   };
+
+  if (!isMounted) return null;
 
   const betSlipContentJSX = (
     <>
