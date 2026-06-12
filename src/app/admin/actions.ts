@@ -71,11 +71,39 @@ export async function updateMatchStatus(matchId: string, status: string, expecte
   revalidatePath("/admin/matches");
 }
 
+export async function updateMatchStartTime(formData: FormData) {
+  const matchId = formData.get("matchId") as string;
+  const startTimeStr = formData.get("startTime") as string;
+
+  if (!matchId || !startTimeStr) return;
+
+  await prisma.match.update({
+    where: { id: matchId },
+    data: { startTime: new Date(startTimeStr) },
+  });
+
+  revalidatePath("/admin/matches");
+}
+
 export async function deleteMatch(id: string) {
   await prisma.match.delete({
     where: { id },
   });
   revalidatePath("/admin/matches");
+}
+
+export async function updateMarketStatus(formData: FormData) {
+  const marketId = formData.get("marketId") as string;
+  const status = formData.get("status") as string;
+
+  if (!marketId || !status) return;
+
+  await prisma.market.update({
+    where: { id: marketId },
+    data: { status },
+  });
+
+  revalidatePath(`/admin/matches`);
 }
 
 export async function createMarket(formData: FormData) {
@@ -92,6 +120,22 @@ export async function createMarket(formData: FormData) {
       allowOnlySingles,
       status: "Open"
     }
+  });
+
+  revalidatePath(`/admin/matches`);
+}
+
+export async function updateOutcomeOdds(formData: FormData) {
+  const outcomeId = formData.get("outcomeId") as string;
+  const oddsStr = formData.get("odds") as string;
+
+  if (!outcomeId || !oddsStr) return;
+
+  const oddsDecimal = parseFloat(oddsStr);
+
+  await prisma.marketOutcome.update({
+    where: { id: outcomeId },
+    data: { oddsDecimal },
   });
 
   revalidatePath(`/admin/matches`);

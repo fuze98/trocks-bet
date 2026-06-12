@@ -135,34 +135,25 @@ export function BetSlip() {
     </>
   );
 
-  // Desktop empty state
-  if (legs.length === 0) {
-    return (
-      <div className="w-80 bg-zinc-900 border-l border-zinc-800 flex-col hidden lg:flex h-[calc(100vh-64px)] sticky top-16">
-        <div className="p-4 border-b border-zinc-800 bg-zinc-950/50">
-          <h2 className="font-bold text-white uppercase tracking-wider text-sm">Bet Slip</h2>
-        </div>
-        <div className="p-6 text-center text-zinc-500 text-sm flex-1">
-          Your bet slip is empty.
-        </div>
-      </div>
-    );
-  }
-
   return (
     <>
       {/* Desktop Layout */}
       <div className="w-80 bg-zinc-900 border-l border-zinc-800 flex-col hidden lg:flex h-[calc(100vh-64px)] sticky top-16 overflow-hidden">
         <div className="p-4 border-b border-zinc-800 bg-zinc-950/50 flex justify-between items-center shrink-0">
           <h2 className="font-bold text-white uppercase tracking-wider text-sm">
-            Bet Slip <span className="bg-green-600 text-white px-2 py-0.5 rounded-full text-xs ml-2">{legs.length}</span>
+            Bet Slip {legs.length > 0 && <span className="bg-green-600 text-white px-2 py-0.5 rounded-full text-xs ml-2">{legs.length}</span>}
           </h2>
-          <button onClick={clearSlip} className="text-xs text-zinc-400 hover:text-white">Clear All</button>
+          {legs.length > 0 && <button onClick={clearSlip} className="text-xs text-zinc-400 hover:text-white">Clear All</button>}
         </div>
-        {betSlipContentJSX}
+        {legs.length === 0 ? (
+          <div className="p-6 text-center text-zinc-500 text-sm flex-1">
+            Your bet slip is empty.
+          </div>
+        ) : betSlipContentJSX}
       </div>
 
       {/* Mobile Layout */}
+      {legs.length > 0 && (
       <div className="lg:hidden fixed bottom-0 left-0 right-0 z-50">
         <AnimatePresence>
           {isMobileExpanded && (
@@ -241,6 +232,7 @@ export function BetSlip() {
           </AnimatePresence>
         </motion.div>
       </div>
+      )}
     </>
   );
 }

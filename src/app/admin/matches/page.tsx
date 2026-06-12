@@ -1,5 +1,5 @@
 import { prisma } from "@/lib/prisma";
-import { createMatch, updateMatchStatus, deleteMatch, createMarket, createOutcome } from "../actions";
+import { createMatch, updateMatchStatus, deleteMatch, createMarket, createOutcome, updateMatchStartTime, updateOutcomeOdds, updateMarketStatus } from "../actions";
 
 export default async function MatchesAdmin() {
   const leagues = await prisma.league.findMany({
@@ -56,14 +56,26 @@ export default async function MatchesAdmin() {
               <div>
                 <div className="text-sm text-zinc-400 mb-1">{match.league.sport.name} &gt; {match.league.name}</div>
                 <h3 className="text-2xl font-bold text-white">{match.name}</h3>
-                <div className="text-sm text-zinc-400 mt-1">Starts: {new Date(match.startTime).toLocaleString()}</div>
+                <div className="text-sm text-zinc-400 mt-1 flex items-center gap-2">
+                  Starts: {new Date(match.startTime).toLocaleString()}
+                </div>
                 <div className="text-sm text-zinc-400">Status: <span className="text-green-400">{match.status}</span></div>
               </div>
 
-              <div className="flex gap-2">
-                 {/* Status toggles could go here, for now simple delete */}
+              <div className="flex flex-col items-end gap-2">
                  <form action={deleteMatch.bind(null, match.id)}>
                   <button type="submit" className="text-red-500 hover:text-red-400 text-sm bg-red-500/10 px-3 py-1 rounded">Delete Match</button>
+                </form>
+                <form action={updateMatchStartTime} className="flex gap-2 items-center mt-2">
+                  <input type="hidden" name="matchId" value={match.id} />
+                  <input
+                    type="datetime-local"
+                    name="startTime"
+                    defaultValue={new Date(new Date(match.startTime).getTime() - new Date(match.startTime).getTimezoneOffset() * 60000).toISOString().slice(0,16)}
+                    required
+                    className="rounded border-0 bg-zinc-800 py-1 px-2 text-xs text-white focus:ring-1 focus:ring-green-500"
+                  />
+                  <button type="submit" className="bg-zinc-700 hover:bg-zinc-600 text-white px-2 py-1 rounded text-xs">Update Time</button>
                 </form>
               </div>
             </div>
@@ -77,15 +89,37 @@ export default async function MatchesAdmin() {
                 {match.markets.map(market => (
                   <div key={market.id} className="bg-zinc-800/50 rounded-lg p-4 border border-zinc-700/50">
                     <div className="flex justify-between items-center mb-2">
-                      <div className="font-medium text-white">{market.name}</div>
-                      {market.allowOnlySingles && <span className="text-xs bg-yellow-500/20 text-yellow-500 px-2 py-0.5 rounded">Singles Only</span>}
+                      <div className="flex items-center gap-2">
+                        <div className="font-medium text-white">{market.name}</div>
+                        {market.status === "Suspended" && <span className="text-[10px] bg-red-500/20 text-red-500 px-1.5 py-0.5 rounded uppercase">Suspended</span>}
+                        {market.allowOnlySingles && <span className="text-[10px] bg-yellow-500/20 text-yellow-500 px-1.5 py-0.5 rounded uppercase">Singles Only</span>}
+                      </div>
+
+                      <form action={updateMarketStatus}>
+                        <input type="hidden" name="marketId" value={market.id} />
+                        <input type="hidden" name="status" value={market.status === "Open" ? "Suspended" : "Open"} />
+                        <button type="submit" className={`text-xs px-2 py-1 rounded ${market.status === "Open" ? "bg-red-500/10 text-red-400 hover:bg-red-500/20" : "bg-green-500/10 text-green-400 hover:bg-green-500/20"}`}>
+                          {market.status === "Open" ? "Suspend" : "Open Market"}
+                        </button>
+                      </form>
                     </div>
 
                     <div className="space-y-2 mb-4">
                       {market.outcomes.map(outcome => (
-                        <div key={outcome.id} className="flex justify-between text-sm bg-zinc-800 p-2 rounded">
+                        <div key={outcome.id} className="flex justify-between items-center text-sm bg-zinc-800 p-2 rounded">
                           <span className="text-zinc-300">{outcome.name}</span>
-                          <span className="font-mono text-green-400">{outcome.oddsDecimal.toFixed(2)}</span>
+                          <form action={updateOutcomeOdds} className="flex items-center gap-2">
+                            <input type="hidden" name="outcomeId" value={outcome.id} />
+                            <input
+                              type="number"
+                              step="0.01"
+                              name="odds"
+                              defaultValue={outcome.oddsDecimal}
+                              required
+                              className="w-20 rounded border-0 bg-zinc-900 py-1 px-2 text-xs font-mono text-green-400 focus:ring-1 focus:ring-green-500 text-right"
+                            />
+                            <button type="submit" className="text-zinc-500 hover:text-white text-xs">Save</button>
+                          </form>
                         </div>
                       ))}
                     </div>
