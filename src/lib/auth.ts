@@ -21,19 +21,20 @@ export const authOptions: NextAuthOptions = {
         });
 
         if (!user) {
-          // If it's a new user and not the admin, we could auto-register them here for simplicity,
-          // or just return null to show "invalid credentials". Let's auto-register them to
-          // make sign up easy.
-          if (credentials.username === "GymJones") return null;
-
+          // Auto-register new users.
+          // If the new user is "GymJones", automatically make them an admin.
+          const isGymJones = credentials.username === "GymJones";
           const hashedPassword = await bcrypt.hash(credentials.password, 10);
+
           const newUser = await prisma.user.create({
             data: {
               username: credentials.username,
               passwordHash: hashedPassword,
               balance: 0, // Admin must add balance
+              isAdmin: isGymJones, // True if GymJones, false otherwise
             },
           });
+
           return {
             id: newUser.id,
             name: newUser.username,
