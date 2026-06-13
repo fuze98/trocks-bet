@@ -72,6 +72,26 @@ export function BetSlip() {
     }
   };
 
+  const QuickWagerButtons = () => (
+    <div className="flex gap-2 mt-2">
+      {[10, 25, 50, 100].map(amt => (
+        <button
+          key={amt}
+          onClick={() => setRiskAmount((riskAmount || 0) + amt)}
+          className="flex-1 bg-zinc-800 hover:bg-zinc-700 text-zinc-300 text-xs py-1.5 rounded transition"
+        >
+          +${amt}
+        </button>
+      ))}
+      <button
+        onClick={() => setRiskAmount(0)}
+        className="flex-1 bg-red-500/10 hover:bg-red-500/20 text-red-400 text-xs py-1.5 rounded transition"
+      >
+        Clear
+      </button>
+    </div>
+  );
+
   if (!isMounted) {
     return null; // Avoid hydration mismatch
   }
@@ -112,18 +132,21 @@ export function BetSlip() {
           <span className="font-mono text-white font-bold">{formatOdds(totalDecimalOdds, oddsFormat)}</span>
         </div>
 
-        <div className="flex items-center gap-3 mb-4">
-          <label className="text-sm text-zinc-400">Risk</label>
-          <div className="relative flex-1">
-            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500">$</span>
-            <input
-              type="number"
-              value={riskAmount || ''}
-              onChange={(e) => setRiskAmount(parseFloat(e.target.value) || 0)}
-              className="w-full bg-zinc-800 border border-zinc-700 rounded py-2 pl-7 pr-3 text-white focus:ring-1 focus:ring-green-500 focus:border-green-500 outline-none font-mono"
-              placeholder="0.00"
-            />
+        <div className="flex flex-col gap-1 mb-4">
+          <div className="flex items-center gap-3">
+            <label className="text-sm text-zinc-400">Risk</label>
+            <div className="relative flex-1">
+              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500">$</span>
+              <input
+                type="number"
+                value={riskAmount || ''}
+                onChange={(e) => setRiskAmount(parseFloat(e.target.value) || 0)}
+                className="w-full bg-zinc-800 border border-zinc-700 rounded py-2 pl-7 pr-3 text-white focus:ring-1 focus:ring-green-500 focus:border-green-500 outline-none font-mono"
+                placeholder="0.00"
+              />
+            </div>
           </div>
+          <QuickWagerButtons />
         </div>
 
         <div className="flex justify-between text-sm mb-6">
@@ -138,7 +161,7 @@ export function BetSlip() {
         <button
           onClick={handlePlaceBet}
           disabled={isPlacing || isInvalidParlay || riskAmount <= 0}
-          className="w-full bg-green-600 hover:bg-green-500 disabled:bg-zinc-700 disabled:text-zinc-500 disabled:cursor-not-allowed text-white font-bold py-3 rounded uppercase tracking-wider text-sm transition"
+          className="w-full bg-green-600 hover:bg-green-500 disabled:bg-zinc-700 disabled:text-zinc-500 disabled:cursor-not-allowed text-white font-bold py-3 rounded uppercase tracking-wider text-sm transition shadow-lg"
         >
           {isPlacing ? "Placing Bet..." : "Place Bet"}
         </button>
