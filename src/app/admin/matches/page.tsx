@@ -109,6 +109,17 @@ export default async function MatchesAdmin() {
                     <label className="block text-sm text-zinc-400 mb-1">Market Name (e.g. Moneyline)</label>
                     <input type="text" name="name" required className="w-full rounded-md border-0 bg-zinc-900 py-2 px-3 text-white focus:ring-1 focus:ring-green-500" />
                   </div>
+                  <div>
+                    <label className="block text-sm text-zinc-400 mb-1">Market Type Grouping</label>
+                    <select name="type" className="w-full rounded-md border-0 bg-zinc-900 py-2 px-3 text-white focus:ring-1 focus:ring-green-500">
+                      <option value="">None (Uses name)</option>
+                      <option value="Moneyline">Moneyline</option>
+                      <option value="Spread">Spread</option>
+                      <option value="Total (Over/Under)">Total (Over/Under)</option>
+                      <option value="Props">Props</option>
+                      <option value="Other">Other</option>
+                    </select>
+                  </div>
                   <div className="flex items-center gap-2">
                     <input type="checkbox" id={`singles-${match.id}`} name="allowOnlySingles" className="rounded bg-zinc-900 border-zinc-700 text-green-500 focus:ring-green-500" />
                     <label htmlFor={`singles-${match.id}`} className="text-sm text-zinc-300">Allow only singles (no parlays)</label>

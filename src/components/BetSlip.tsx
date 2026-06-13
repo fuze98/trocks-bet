@@ -7,6 +7,8 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { ChevronUp, ChevronDown, Trash2 } from "lucide-react";
+import toast from "react-hot-toast";
+import { CoalAnimation } from "./CoalAnimation";
 
 export function BetSlip() {
   const { legs, riskAmount, oddsFormat, removeLeg, clearSlip, setRiskAmount } = useBetSlip();
@@ -14,6 +16,7 @@ export function BetSlip() {
   const [isPlacing, setIsPlacing] = useState(false);
   const [error, setError] = useState("");
   const router = useRouter();
+  const [showAnimation, setShowAnimation] = useState(false);
 
   // Hydration state
   const [isMounted, setIsMounted] = useState(false);
@@ -59,14 +62,16 @@ export function BetSlip() {
 
       if (!res.ok) {
         setError(data.error || "Failed to place bet");
+        toast.error(data.error || "Failed to place bet");
       } else {
+        toast.success("Bet placed successfully!");
+        setShowAnimation(true);
         clearSlip();
         setIsOpenMobile(false);
-        // Refresh to update balance and ui
-        window.location.reload();
       }
     } catch (err) {
       setError("An unexpected error occurred.");
+      toast.error("An unexpected error occurred.");
     } finally {
       setIsPlacing(false);
     }
@@ -168,6 +173,11 @@ export function BetSlip() {
           </div>
           <BetSlipContent />
         </div>
+      )}
+
+      {/* Animation Overlay */}
+      {showAnimation && (
+        <CoalAnimation onComplete={() => window.location.reload()} />
       )}
 
       {/* Mobile Drawer View */}

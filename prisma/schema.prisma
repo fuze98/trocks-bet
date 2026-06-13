@@ -20,6 +20,7 @@ model User {
   createdAt      DateTime  @default(now())
   updatedAt      DateTime  @updatedAt
   bets           Bet[]
+  messages       Message[]
 }
 
 model Sport {
@@ -58,6 +59,7 @@ model Match {
 model Market {
   id               String          @id @default(cuid())
   name             String          // e.g., "Moneyline", "Over/Under 45.5"
+  type             String?         // e.g., "Moneyline", "Spread", "Total"
   matchId          String
   match            Match           @relation(fields: [matchId], references: [id], onDelete: Cascade)
   allowOnlySingles Boolean         @default(false)
@@ -65,6 +67,16 @@ model Market {
   outcomes         MarketOutcome[]
   createdAt        DateTime        @default(now())
   updatedAt        DateTime        @updatedAt
+}
+
+model Message {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  content   String
+  reply     String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model MarketOutcome {
