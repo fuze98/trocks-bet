@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/prisma";
+import { replyToMessage } from "../actions";
 
 export const revalidate = 0; // Disable static caching for dynamic data
 
@@ -40,6 +41,30 @@ export default async function AdminSupportPage() {
                 <div className="bg-zinc-800 rounded-lg p-4 mb-4">
                   <p className="text-zinc-300 whitespace-pre-wrap">{message.content}</p>
                 </div>
+
+                {message.reply ? (
+                  <div className="bg-zinc-950 rounded-lg p-4 border border-zinc-800">
+                    <div className="text-sm font-bold text-green-500 mb-1">Admin Reply:</div>
+                    <p className="text-zinc-400 whitespace-pre-wrap">{message.reply}</p>
+                  </div>
+                ) : (
+                  <form action={replyToMessage} className="mt-4 flex gap-2">
+                    <input type="hidden" name="messageId" value={message.id} />
+                    <input
+                      type="text"
+                      name="reply"
+                      placeholder="Type a reply..."
+                      required
+                      className="flex-1 rounded-md border-0 bg-zinc-950 py-2 px-3 text-white focus:ring-1 focus:ring-green-500"
+                    />
+                    <button
+                      type="submit"
+                      className="bg-green-600 hover:bg-green-500 text-white px-4 py-2 rounded-md text-sm font-bold transition-colors"
+                    >
+                      Reply
+                    </button>
+                  </form>
+                )}
               </div>
             ))
           )}

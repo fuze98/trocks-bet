@@ -17,6 +17,7 @@ model User {
   balance        Float     @default(0.0) // Social Credit Capital
   isAdmin        Boolean   @default(false)
   isTemporaryPwd Boolean   @default(false)
+  limitMultiplier Float    @default(1.0) // 1.0 = 100%, 0.5 = 50%, etc.
   createdAt      DateTime  @default(now())
   updatedAt      DateTime  @updatedAt
   bets           Bet[]
@@ -63,8 +64,21 @@ model Market {
   matchId          String
   match            Match           @relation(fields: [matchId], references: [id], onDelete: Cascade)
   allowOnlySingles Boolean         @default(false)
-  status           String          @default("Open") // Open, Graded
+  status           String          @default("Open") // Open, Graded, Suspended
+  userLimit        Float?          // Maximum amount a user can bet on this market
+  totalLimit       Float?          // Maximum total amount that can be bet on this market
   outcomes         MarketOutcome[]
+  createdAt        DateTime        @default(now())
+  updatedAt        DateTime        @updatedAt
+}
+
+model MarketTemplate {
+  id               String          @id @default(cuid())
+  name             String          // e.g., "Moneyline", "Spread"
+  type             String          // e.g., "Moneyline", "Spread", "Total"
+  allowOnlySingles Boolean         @default(false)
+  defaultUserLimit Float?
+  defaultTotalLimit Float?
   createdAt        DateTime        @default(now())
   updatedAt        DateTime        @updatedAt
 }

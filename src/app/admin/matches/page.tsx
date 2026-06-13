@@ -17,6 +17,10 @@ export default async function MatchesAdmin() {
     orderBy: { startTime: 'desc' }
   });
 
+  const templates = await prisma.marketTemplate.findMany({
+    orderBy: { name: 'asc' }
+  });
+
   return (
     <div className="space-y-8">
       <div>
@@ -56,14 +60,29 @@ export default async function MatchesAdmin() {
               <div>
                 <div className="text-sm text-zinc-400 mb-1">{match.league.sport.name} &gt; {match.league.name}</div>
                 <h3 className="text-2xl font-bold text-white">{match.name}</h3>
-                <div className="text-sm text-zinc-400 mt-1">Starts: {new Date(match.startTime).toLocaleString()}</div>
+                <div className="text-sm text-zinc-400 mt-2 mb-1 flex items-center gap-2">
+                  <span>Starts:</span>
+                  <form action={async (formData) => {
+                    "use server";
+                    const { updateMatchStartTime } = await import('../actions');
+                    await updateMatchStartTime(match.id, formData.get("startTime") as string);
+                  }} className="flex items-center gap-2">
+                    <input
+                      type="datetime-local"
+                      name="startTime"
+                      defaultValue={new Date(match.startTime.getTime() - match.startTime.getTimezoneOffset() * 60000).toISOString().slice(0, 16)}
+                      className="rounded border border-zinc-700 bg-zinc-800 py-1 px-2 text-xs text-white focus:ring-1 focus:ring-green-500"
+                    />
+                    <button type="submit" className="bg-zinc-700 hover:bg-zinc-600 px-2 py-1 rounded text-xs">Save</button>
+                  </form>
+                </div>
                 <div className="text-sm text-zinc-400">Status: <span className="text-green-400">{match.status}</span></div>
               </div>
 
               <div className="flex gap-2">
                  {/* Status toggles could go here, for now simple delete */}
                  <form action={deleteMatch.bind(null, match.id)}>
-                  <button type="submit" className="text-red-500 hover:text-red-400 text-sm bg-red-500/10 px-3 py-1 rounded">Delete Match</button>
+                  <button type="submit" className="text-red-500 hover:text-red-400 text-sm bg-red-500/10 px-3 py-1 rounded transition-colors">Delete Match</button>
                 </form>
               </div>
             </div>
@@ -83,9 +102,22 @@ export default async function MatchesAdmin() {
 
                     <div className="space-y-2 mb-4">
                       {market.outcomes.map(outcome => (
-                        <div key={outcome.id} className="flex justify-between text-sm bg-zinc-800 p-2 rounded">
-                          <span className="text-zinc-300">{outcome.name}</span>
-                          <span className="font-mono text-green-400">{outcome.oddsDecimal.toFixed(2)}</span>
+                        <div key={outcome.id} className="flex justify-between items-center text-sm bg-zinc-800 p-2 rounded">
+                          <span className="text-zinc-300 flex-1">{outcome.name}</span>
+                          <form action={async (formData) => {
+                            "use server";
+                            const { updateOutcomeOdds } = await import('../actions');
+                            await updateOutcomeOdds(outcome.id, formData.get("odds") as string);
+                          }} className="flex items-center gap-2">
+                            <input
+                              type="number"
+                              step="0.01"
+                              name="odds"
+                              defaultValue={outcome.oddsDecimal}
+                              className="w-20 rounded border border-zinc-700 bg-zinc-900 py-1 px-2 text-sm text-green-400 font-mono text-right focus:ring-1 focus:ring-green-500"
+                            />
+                            <button type="submit" className="bg-zinc-700 hover:bg-zinc-600 px-2 py-1 rounded text-xs">Save</button>
+                          </form>
                         </div>
                       ))}
                     </div>
@@ -100,32 +132,58 @@ export default async function MatchesAdmin() {
                 ))}
               </div>
 
-              {/* Add Market Form */}
-              <div className="bg-zinc-800/30 rounded-lg p-4 border border-zinc-800 h-fit">
-                <h4 className="text-md font-semibold text-white mb-4">Add Market</h4>
-                <form action={createMarket} className="space-y-4">
-                  <input type="hidden" name="matchId" value={match.id} />
-                  <div>
-                    <label className="block text-sm text-zinc-400 mb-1">Market Name (e.g. Moneyline)</label>
-                    <input type="text" name="name" required className="w-full rounded-md border-0 bg-zinc-900 py-2 px-3 text-white focus:ring-1 focus:ring-green-500" />
-                  </div>
-                  <div>
-                    <label className="block text-sm text-zinc-400 mb-1">Market Type Grouping</label>
-                    <select name="type" className="w-full rounded-md border-0 bg-zinc-900 py-2 px-3 text-white focus:ring-1 focus:ring-green-500">
-                      <option value="">None (Uses name)</option>
-                      <option value="Moneyline">Moneyline</option>
-                      <option value="Spread">Spread</option>
-                      <option value="Total (Over/Under)">Total (Over/Under)</option>
-                      <option value="Props">Props</option>
-                      <option value="Other">Other</option>
-                    </select>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <input type="checkbox" id={`singles-${match.id}`} name="allowOnlySingles" className="rounded bg-zinc-900 border-zinc-700 text-green-500 focus:ring-green-500" />
-                    <label htmlFor={`singles-${match.id}`} className="text-sm text-zinc-300">Allow only singles (no parlays)</label>
-                  </div>
-                  <button type="submit" className="w-full bg-zinc-700 hover:bg-zinc-600 text-white px-4 py-2 rounded-md text-sm font-medium">Add Market</button>
-                </form>
+              {/* Add Market Forms */}
+              <div className="space-y-4 h-fit">
+
+                {/* Add from Template */}
+                <div className="bg-zinc-800/30 rounded-lg p-4 border border-zinc-800">
+                  <h4 className="text-md font-semibold text-white mb-4">Add Market From Template</h4>
+                  <form action={async (formData) => {
+                    "use server";
+                    const { createMarketFromTemplate } = await import('../actions');
+                    await createMarketFromTemplate(formData);
+                  }} className="space-y-4">
+                    <input type="hidden" name="matchId" value={match.id} />
+                    <div>
+                      <label className="block text-sm text-zinc-400 mb-1">Select Template</label>
+                      <select name="templateId" required className="w-full rounded-md border-0 bg-zinc-900 py-2 px-3 text-white focus:ring-1 focus:ring-green-500">
+                        <option value="">Choose a template...</option>
+                        {templates.map(t => (
+                          <option key={t.id} value={t.id}>{t.name} ({t.type})</option>
+                        ))}
+                      </select>
+                    </div>
+                    <button type="submit" className="w-full bg-green-600/20 hover:bg-green-600/30 text-green-500 border border-green-500/50 px-4 py-2 rounded-md text-sm font-bold transition-colors">Add From Template</button>
+                  </form>
+                </div>
+
+                {/* Add Custom Market Form */}
+                <div className="bg-zinc-800/30 rounded-lg p-4 border border-zinc-800">
+                  <h4 className="text-md font-semibold text-white mb-4">Add Custom Market</h4>
+                  <form action={createMarket} className="space-y-4">
+                    <input type="hidden" name="matchId" value={match.id} />
+                    <div>
+                      <label className="block text-sm text-zinc-400 mb-1">Market Name (e.g. Moneyline)</label>
+                      <input type="text" name="name" required className="w-full rounded-md border-0 bg-zinc-900 py-2 px-3 text-white focus:ring-1 focus:ring-green-500" />
+                    </div>
+                    <div>
+                      <label className="block text-sm text-zinc-400 mb-1">Market Type Grouping</label>
+                      <select name="type" className="w-full rounded-md border-0 bg-zinc-900 py-2 px-3 text-white focus:ring-1 focus:ring-green-500">
+                        <option value="">None (Uses name)</option>
+                        <option value="Moneyline">Moneyline</option>
+                        <option value="Spread">Spread</option>
+                        <option value="Total (Over/Under)">Total (Over/Under)</option>
+                        <option value="Props">Props</option>
+                        <option value="Other">Other</option>
+                      </select>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <input type="checkbox" id={`singles-${match.id}`} name="allowOnlySingles" className="rounded bg-zinc-900 border-zinc-700 text-green-500 focus:ring-green-500" />
+                      <label htmlFor={`singles-${match.id}`} className="text-sm text-zinc-300">Allow only singles (no parlays)</label>
+                    </div>
+                    <button type="submit" className="w-full bg-zinc-700 hover:bg-zinc-600 text-white px-4 py-2 rounded-md text-sm font-medium">Add Custom Market</button>
+                  </form>
+                </div>
               </div>
             </div>
 

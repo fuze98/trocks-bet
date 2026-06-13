@@ -38,6 +38,12 @@ export default async function AdminLayout({
             Matches & Markets
           </Link>
           <Link
+            href="/admin/templates"
+            className="px-3 py-2 rounded-md hover:bg-zinc-800 text-zinc-300 font-medium"
+          >
+            Market Templates
+          </Link>
+          <Link
             href="/admin/liabilities"
             className="px-3 py-2 rounded-md hover:bg-zinc-800 text-zinc-300 font-medium"
           >
@@ -54,6 +60,18 @@ export default async function AdminLayout({
             className="px-3 py-2 rounded-md hover:bg-zinc-800 text-zinc-300 font-medium"
           >
             Customer Support
+          </Link>
+          <Link
+            href="/admin/alarms"
+            className="px-3 py-2 rounded-md hover:bg-zinc-800 text-zinc-300 font-medium"
+          >
+            Market Alarms
+          </Link>
+          <Link
+            href="/admin/tickets"
+            className="px-3 py-2 rounded-md hover:bg-zinc-800 text-zinc-300 font-medium"
+          >
+            Ticket Feed
           </Link>
           <Link
             href="/"

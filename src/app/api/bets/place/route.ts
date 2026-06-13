@@ -41,11 +41,12 @@ export async function POST(req: Request) {
       let totalOdds = 1;
       let hasSinglesOnly = false;
       const matchIds = new Set<string>();
+      const marketUpdates = [];
 
       for (const outcome of outcomes) {
         // Validation checks
         if (outcome.market.status !== "Open" || outcome.status !== "Pending") {
-          throw new Error(`Market "${outcome.market.name}" is closed`);
+          throw new Error(`Market "${outcome.market.name}" is closed or suspended`);
         }
         if (outcome.market.match.status !== "Scheduled" || new Date() >= outcome.market.match.startTime) {
           throw new Error(`Match "${outcome.market.match.name}" has already started`);
@@ -56,6 +57,32 @@ export async function POST(req: Request) {
         if (matchIds.has(outcome.market.match.id)) {
            throw new Error("Cannot parlay multiple outcomes from the same match");
         }
+
+        // Limit Checks
+        if (outcome.market.userLimit) {
+          const maxWager = outcome.market.userLimit * user.limitMultiplier;
+          if (amount > maxWager) {
+            throw new Error(`Exceeds maximum wager of $${maxWager.toFixed(2)} for ${outcome.market.name}`);
+          }
+        }
+
+        if (outcome.market.totalLimit) {
+          // Calculate total wagers on this market currently
+          const marketLegs = await tx.betLeg.findMany({
+            where: { marketOutcome: { marketId: outcome.market.id } },
+            include: { bet: true }
+          });
+          const totalWageredSoFar = marketLegs.reduce((sum, leg) => sum + leg.bet.amount, 0);
+
+          if (totalWageredSoFar + amount > outcome.market.totalLimit) {
+            // Exceeds total limit. Suspend the market and reject the bet.
+            marketUpdates.push({ id: outcome.market.id, status: "Suspended" });
+            const err: any = new Error(`Market ${outcome.market.name} has reached its capacity and has been suspended. Please check alarms.`);
+            err.marketUpdates = marketUpdates;
+            throw err;
+          }
+        }
+
         matchIds.add(outcome.market.match.id);
         totalOdds *= outcome.oddsDecimal;
       }
@@ -92,6 +119,15 @@ export async function POST(req: Request) {
     return NextResponse.json({ success: true, betId: betResult.id });
 
   } catch (error: any) {
+    // If the transaction threw an error because of limits, check if we have suspended markets to commit
+    if (error.marketUpdates) {
+       for (const update of error.marketUpdates) {
+         await prisma.market.update({
+            where: { id: update.id },
+            data: { status: update.status }
+         });
+       }
+    }
     return NextResponse.json({ error: error.message || "Internal Server Error" }, { status: 400 });
   }
 }

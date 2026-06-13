@@ -32,7 +32,7 @@ export default function Login() {
     <div className="flex h-screen w-full items-center justify-center bg-zinc-950 text-zinc-100">
       <div className="w-full max-w-md space-y-8 rounded-xl bg-zinc-900 p-8 shadow-2xl ring-1 ring-zinc-800">
         <div className="flex flex-col items-center gap-4 text-center">
-          <div className="text-5xl">🚜</div>
+          <div className="text-5xl drop-shadow-[0_0_12px_rgba(34,197,94,0.4)]">🛻</div>
           <h2 className="text-3xl font-black tracking-tight text-white">
             Trocks<span className="text-green-500">Bet</span>
           </h2>

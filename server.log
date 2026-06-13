@@ -6,7 +6,35 @@
   - Local:        http://localhost:3000
 
  ✓ Starting...
- ✓ Ready in 806ms
+ ✓ Ready in 419ms
+[next-auth][error][NO_SECRET]
+https://next-auth.js.org/errors#no_secret Please define a `secret` in production. t [MissingSecretError]: Please define a `secret` in production.
+    at t.assertConfig (/app/.next/server/chunks/656.js:6:107402)
+    at _ (/app/.next/server/chunks/656.js:6:100657)
+    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+    at async a (/app/.next/server/chunks/656.js:30:20116)
+    at async e.length.t (/app/.next/server/chunks/656.js:30:21606)
+    at async /app/node_modules/next/dist/compiled/next-server/app-route.runtime.prod.js:6:34666
+    at async eS.execute (/app/node_modules/next/dist/compiled/next-server/app-route.runtime.prod.js:6:25813)
+    at async eS.handle (/app/node_modules/next/dist/compiled/next-server/app-route.runtime.prod.js:6:35920)
+    at async doRender (/app/node_modules/next/dist/server/base-server.js:1377:42)
+    at async cacheEntry.responseCache.get.routeKind (/app/node_modules/next/dist/server/base-server.js:1599:28) {
+  code: 'NO_SECRET'
+}
+[next-auth][error][NO_SECRET]
+https://next-auth.js.org/errors#no_secret Please define a `secret` in production. t [MissingSecretError]: Please define a `secret` in production.
+    at t.assertConfig (/app/.next/server/chunks/656.js:6:107402)
+    at _ (/app/.next/server/chunks/656.js:6:100657)
+    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+    at async a (/app/.next/server/chunks/656.js:30:20116)
+    at async e.length.t (/app/.next/server/chunks/656.js:30:21606)
+    at async /app/node_modules/next/dist/compiled/next-server/app-route.runtime.prod.js:6:34666
+    at async eS.execute (/app/node_modules/next/dist/compiled/next-server/app-route.runtime.prod.js:6:25813)
+    at async eS.handle (/app/node_modules/next/dist/compiled/next-server/app-route.runtime.prod.js:6:35920)
+    at async doRender (/app/node_modules/next/dist/server/base-server.js:1377:42)
+    at async cacheEntry.responseCache.get.routeKind (/app/node_modules/next/dist/server/base-server.js:1599:28) {
+  code: 'NO_SECRET'
+}
 [next-auth][error][NO_SECRET]
 https://next-auth.js.org/errors#no_secret Please define a `secret` in production. t [MissingSecretError]: Please define a `secret` in production.
     at t.assertConfig (/app/.next/server/chunks/656.js:6:107402)
