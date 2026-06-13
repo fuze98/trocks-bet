@@ -1,9 +1,13 @@
 import { prisma } from "@/lib/prisma";
-import { createSport, deleteSport, createLeague, deleteLeague } from "../actions";
+import { createSport, deleteSport, createLeague, deleteLeague, createTeam, deleteTeam } from "../actions";
 
 export default async function SportsAdmin() {
   const sports = await prisma.sport.findMany({
-    include: { leagues: true },
+    include: {
+      leagues: {
+        include: { teams: { orderBy: { name: 'asc' } } }
+      }
+    },
     orderBy: { name: 'asc' }
   });
 
@@ -45,16 +49,41 @@ export default async function SportsAdmin() {
               {sport.leagues.length === 0 ? (
                 <p className="text-sm text-zinc-500">No leagues yet.</p>
               ) : (
-                <ul className="space-y-2">
+                <div className="space-y-4">
                   {sport.leagues.map(league => (
-                    <li key={league.id} className="flex justify-between items-center bg-zinc-800 px-3 py-2 rounded-md">
-                      <span className="text-zinc-200">{league.name}</span>
-                      <form action={deleteLeague.bind(null, league.id)}>
-                        <button type="submit" className="text-red-500 hover:text-red-400 text-xs">Remove</button>
+                    <div key={league.id} className="bg-zinc-800/50 rounded-lg p-3 border border-zinc-700/50">
+                      <div className="flex justify-between items-center mb-3">
+                        <span className="font-bold text-white">{league.name}</span>
+                        <form action={deleteLeague.bind(null, league.id)}>
+                          <button type="submit" className="text-red-500 hover:text-red-400 text-xs font-bold bg-red-500/10 px-2 py-1 rounded">Remove League</button>
+                        </form>
+                      </div>
+
+                      <div className="space-y-1 mb-3">
+                        {league.teams.map(team => (
+                          <div key={team.id} className="flex justify-between items-center bg-zinc-900 px-2 py-1 rounded border border-zinc-800">
+                            <span className="text-xs text-zinc-300">{team.name}</span>
+                            <form action={deleteTeam.bind(null, team.id)}>
+                              <button type="submit" className="text-red-500 hover:text-red-400 text-[10px]">×</button>
+                            </form>
+                          </div>
+                        ))}
+                      </div>
+
+                      <form action={createTeam} className="flex gap-1">
+                        <input type="hidden" name="leagueId" value={league.id} />
+                        <input
+                          type="text"
+                          name="name"
+                          placeholder="Add Team (e.g. Vegas Golden Knights)"
+                          required
+                          className="flex-1 rounded border-0 bg-zinc-900 py-1 px-2 text-xs text-white focus:ring-1 focus:ring-green-500"
+                        />
+                        <button type="submit" className="bg-zinc-700 hover:bg-zinc-600 text-white px-2 py-1 rounded text-xs font-bold">+</button>
                       </form>
-                    </li>
+                    </div>
                   ))}
-                </ul>
+                </div>
               )}
 
               <form action={createLeague} className="flex gap-2 mt-4 pt-4 border-t border-zinc-800/50">
@@ -64,10 +93,10 @@ export default async function SportsAdmin() {
                   name="name"
                   placeholder="New League"
                   required
-                  className="flex-1 rounded-md border-0 bg-zinc-800 py-1 px-3 text-sm text-white placeholder-zinc-400 focus:ring-1 focus:ring-green-500"
+                  className="flex-1 rounded-md border-0 bg-zinc-800 py-2 px-3 text-sm text-white placeholder-zinc-400 focus:ring-1 focus:ring-green-500"
                 />
-                <button type="submit" className="bg-zinc-700 hover:bg-zinc-600 text-white px-3 py-1 rounded-md text-sm">
-                  Add
+                <button type="submit" className="bg-zinc-700 hover:bg-zinc-600 text-white px-4 py-2 rounded-md text-sm font-bold">
+                  Add League
                 </button>
               </form>
             </div>

@@ -38,10 +38,24 @@ model League {
   sportId     String
   sport       Sport    @relation(fields: [sportId], references: [id], onDelete: Cascade)
   matches     Match[]
+  teams       Team[]
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
   @@unique([name, sportId])
+}
+
+model Team {
+  id          String   @id @default(cuid())
+  name        String
+  leagueId    String
+  league      League   @relation(fields: [leagueId], references: [id], onDelete: Cascade)
+  homeMatches Match[]  @relation("HomeTeam")
+  awayMatches Match[]  @relation("AwayTeam")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@unique([name, leagueId])
 }
 
 model Match {
@@ -49,6 +63,10 @@ model Match {
   name               String    // e.g., "Team A vs Team B"
   leagueId           String
   league             League    @relation(fields: [leagueId], references: [id], onDelete: Cascade)
+  homeTeamId         String?
+  homeTeam           Team?     @relation("HomeTeam", fields: [homeTeamId], references: [id])
+  awayTeamId         String?
+  awayTeam           Team?     @relation("AwayTeam", fields: [awayTeamId], references: [id])
   startTime          DateTime
   expectedResultTime DateTime?
   status             String    @default("Scheduled") // Scheduled, In Progress, Completed
@@ -79,6 +97,7 @@ model MarketTemplate {
   allowOnlySingles Boolean         @default(false)
   defaultUserLimit Float?
   defaultTotalLimit Float?
+  outcomesFormat   String[]        // e.g., ["{home}", "{away}"] or ["Over {line}", "Under {line}"]
   createdAt        DateTime        @default(now())
   updatedAt        DateTime        @updatedAt
 }

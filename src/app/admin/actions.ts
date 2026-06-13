@@ -42,16 +42,32 @@ export async function deleteLeague(id: string) {
 }
 
 export async function createMatch(formData: FormData) {
-  const name = formData.get("name") as string;
   const leagueId = formData.get("leagueId") as string;
+  const homeTeamId = formData.get("homeTeamId") as string;
+  const awayTeamId = formData.get("awayTeamId") as string;
   const startTimeStr = formData.get("startTime") as string;
+  const customName = formData.get("customName") as string;
 
-  if (!name || !leagueId || !startTimeStr) return;
+  if (!leagueId || !startTimeStr) return;
+  if (!customName && (!homeTeamId || !awayTeamId)) return;
+
+  let name = customName;
+  if (!name) {
+    const homeTeam = await prisma.team.findUnique({ where: { id: homeTeamId } });
+    const awayTeam = await prisma.team.findUnique({ where: { id: awayTeamId } });
+    if (homeTeam && awayTeam) {
+      name = `${homeTeam.name} - ${awayTeam.name}`;
+    } else {
+      return;
+    }
+  }
 
   await prisma.match.create({
     data: {
       name,
       leagueId,
+      homeTeamId: homeTeamId || null,
+      awayTeamId: awayTeamId || null,
       startTime: new Date(startTimeStr),
       status: "Scheduled",
     },
@@ -185,17 +201,22 @@ export async function updateMarketLimitsAndReopen(marketId: string, userLimitStr
 export async function createMarketTemplate(formData: FormData) {
   const name = formData.get("name") as string;
   const type = formData.get("type") as string;
+  const outcomesFormatStr = formData.get("outcomesFormat") as string;
   const allowOnlySingles = formData.get("allowOnlySingles") === "on";
   const defaultUserLimitStr = formData.get("defaultUserLimit") as string;
   const defaultTotalLimitStr = formData.get("defaultTotalLimit") as string;
 
   if (!name || !type) return;
 
+  // Split comma separated outcomes
+  const outcomesFormat = outcomesFormatStr ? outcomesFormatStr.split(',').map(s => s.trim()).filter(s => s) : [];
+
   await prisma.marketTemplate.create({
     data: {
       name,
       type,
       allowOnlySingles,
+      outcomesFormat,
       defaultUserLimit: defaultUserLimitStr ? parseFloat(defaultUserLimitStr) : null,
       defaultTotalLimit: defaultTotalLimitStr ? parseFloat(defaultTotalLimitStr) : null
     }
@@ -215,13 +236,16 @@ export async function deleteMarketTemplate(id: string) {
 export async function createMarketFromTemplate(formData: FormData) {
   const templateId = formData.get("templateId") as string;
   const matchId = formData.get("matchId") as string;
+  const line = formData.get("line") as string;
+  const player = formData.get("player") as string;
 
   if (!templateId || !matchId) return;
 
   const template = await prisma.marketTemplate.findUnique({ where: { id: templateId } });
-  if (!template) return;
+  const match = await prisma.match.findUnique({ where: { id: matchId }, include: { homeTeam: true, awayTeam: true } });
+  if (!template || !match) return;
 
-  await prisma.market.create({
+  const market = await prisma.market.create({
     data: {
       name: template.name,
       type: template.type,
@@ -233,5 +257,47 @@ export async function createMarketFromTemplate(formData: FormData) {
     }
   });
 
+  if (template.outcomesFormat && template.outcomesFormat.length > 0) {
+    const outcomesData = template.outcomesFormat.map(fmt => {
+      let text = fmt;
+      text = text.replace("{home}", match.homeTeam?.name || "Home Team");
+      text = text.replace("{away}", match.awayTeam?.name || "Away Team");
+      text = text.replace("{line}", line ? (Number(line) > 0 && text.includes("Spread") ? `+${line}` : line) : "");
+      text = text.replace("{inverse_line}", line ? (Number(line) * -1 > 0 ? `+${Number(line) * -1}` : String(Number(line) * -1)) : "");
+      text = text.replace("{player}", player || "");
+
+      return {
+        name: text.trim(),
+        marketId: market.id,
+        oddsDecimal: 1.91, // Default odds
+        status: "Pending"
+      };
+    });
+
+    await prisma.marketOutcome.createMany({
+      data: outcomesData
+    });
+  }
+
   revalidatePath("/admin/matches");
+}
+
+export async function createTeam(formData: FormData) {
+  const name = formData.get("name") as string;
+  const leagueId = formData.get("leagueId") as string;
+
+  if (!name || !leagueId) return;
+
+  await prisma.team.create({
+    data: { name, leagueId },
+  });
+
+  revalidatePath("/admin/sports");
+}
+
+export async function deleteTeam(id: string) {
+  await prisma.team.delete({
+    where: { id },
+  });
+  revalidatePath("/admin/sports");
 }

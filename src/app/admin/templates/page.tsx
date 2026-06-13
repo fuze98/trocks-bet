@@ -31,6 +31,11 @@ export default async function TemplatesAdmin() {
                 <option value="Other">Other</option>
               </select>
             </div>
+            <div className="flex-1 min-w-[300px] w-full">
+              <label className="block text-sm font-medium text-zinc-400 mb-1">Outcomes Format (Comma separated)</label>
+              <input type="text" name="outcomesFormat" placeholder="e.g. {home} {line}, {away} {inverse_line}" className="w-full rounded-md border-0 bg-zinc-950 py-2 px-3 text-white focus:ring-1 focus:ring-green-500" />
+              <p className="text-[10px] text-zinc-500 mt-1">Placeholders: {"{home}"}, {"{away}"}, {"{line}"}, {"{inverse_line}"}, {"{player}"}</p>
+            </div>
             <div className="flex-1 min-w-[150px]">
               <label className="block text-sm font-medium text-zinc-400 mb-1">Default User Limit ($)</label>
               <input type="number" step="0.01" name="defaultUserLimit" placeholder="Optional" className="w-full rounded-md border-0 bg-zinc-950 py-2 px-3 text-white focus:ring-1 focus:ring-green-500" />
@@ -65,6 +70,16 @@ export default async function TemplatesAdmin() {
               </div>
 
               <div className="space-y-2 mt-4 pt-4 border-t border-zinc-800/50">
+                {template.outcomesFormat && template.outcomesFormat.length > 0 && (
+                  <div className="mb-4">
+                    <span className="text-xs text-zinc-500 block mb-1">Generated Outcomes:</span>
+                    <div className="flex flex-wrap gap-2">
+                      {template.outcomesFormat.map((fmt, i) => (
+                         <span key={i} className="text-[10px] font-mono bg-zinc-950 px-2 py-1 rounded border border-zinc-800 text-zinc-300">{fmt}</span>
+                      ))}
+                    </div>
+                  </div>
+                )}
                 <div className="flex justify-between text-sm">
                   <span className="text-zinc-500">Default User Limit:</span>
                   <span className="text-zinc-300 font-mono">{template.defaultUserLimit ? `$${template.defaultUserLimit}` : 'None'}</span>

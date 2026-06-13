@@ -1,15 +1,21 @@
 import { prisma } from "@/lib/prisma";
 import { createMatch, updateMatchStatus, deleteMatch, createMarket, createOutcome } from "../actions";
+import { AddMarketFromTemplate } from "@/components/AddMarketFromTemplate";
 
 export default async function MatchesAdmin() {
   const leagues = await prisma.league.findMany({
-    include: { sport: true },
+    include: {
+      sport: true,
+      teams: { orderBy: { name: 'asc' } }
+    },
     orderBy: { name: 'asc' }
   });
 
   const matches = await prisma.match.findMany({
     include: {
       league: { include: { sport: true } },
+      homeTeam: true,
+      awayTeam: true,
       markets: {
         include: { outcomes: true }
       }
@@ -39,8 +45,26 @@ export default async function MatchesAdmin() {
               </select>
             </div>
             <div className="flex-1 min-w-[200px]">
-              <label className="block text-sm font-medium text-zinc-400 mb-1">Match Name (e.g. Team A vs Team B)</label>
-              <input type="text" name="name" required className="w-full rounded-md border-0 bg-zinc-800 py-2 px-3 text-white focus:ring-2 focus:ring-green-500" />
+              <label className="block text-sm font-medium text-zinc-400 mb-1">Home Team</label>
+              <select name="homeTeamId" className="w-full rounded-md border-0 bg-zinc-800 py-2 px-3 text-white focus:ring-2 focus:ring-green-500">
+                <option value="">Select (optional)...</option>
+                {leagues.flatMap(l => l.teams).map(t => (
+                  <option key={`h-${t.id}`} value={t.id}>{t.name}</option>
+                ))}
+              </select>
+            </div>
+            <div className="flex-1 min-w-[200px]">
+              <label className="block text-sm font-medium text-zinc-400 mb-1">Away Team</label>
+              <select name="awayTeamId" className="w-full rounded-md border-0 bg-zinc-800 py-2 px-3 text-white focus:ring-2 focus:ring-green-500">
+                <option value="">Select (optional)...</option>
+                {leagues.flatMap(l => l.teams).map(t => (
+                  <option key={`a-${t.id}`} value={t.id}>{t.name}</option>
+                ))}
+              </select>
+            </div>
+            <div className="flex-1 min-w-[200px]">
+              <label className="block text-sm font-medium text-zinc-400 mb-1">Custom Name (if no teams)</label>
+              <input type="text" name="customName" placeholder="e.g. Winner of Tournament" className="w-full rounded-md border-0 bg-zinc-800 py-2 px-3 text-white focus:ring-2 focus:ring-green-500" />
             </div>
             <div className="flex-1 min-w-[200px]">
               <label className="block text-sm font-medium text-zinc-400 mb-1">Start Time</label>
@@ -138,23 +162,7 @@ export default async function MatchesAdmin() {
                 {/* Add from Template */}
                 <div className="bg-zinc-800/30 rounded-lg p-4 border border-zinc-800">
                   <h4 className="text-md font-semibold text-white mb-4">Add Market From Template</h4>
-                  <form action={async (formData) => {
-                    "use server";
-                    const { createMarketFromTemplate } = await import('../actions');
-                    await createMarketFromTemplate(formData);
-                  }} className="space-y-4">
-                    <input type="hidden" name="matchId" value={match.id} />
-                    <div>
-                      <label className="block text-sm text-zinc-400 mb-1">Select Template</label>
-                      <select name="templateId" required className="w-full rounded-md border-0 bg-zinc-900 py-2 px-3 text-white focus:ring-1 focus:ring-green-500">
-                        <option value="">Choose a template...</option>
-                        {templates.map(t => (
-                          <option key={t.id} value={t.id}>{t.name} ({t.type})</option>
-                        ))}
-                      </select>
-                    </div>
-                    <button type="submit" className="w-full bg-green-600/20 hover:bg-green-600/30 text-green-500 border border-green-500/50 px-4 py-2 rounded-md text-sm font-bold transition-colors">Add From Template</button>
-                  </form>
+                  <AddMarketFromTemplate templates={templates} match={match} />
                 </div>
 
                 {/* Add Custom Market Form */}
