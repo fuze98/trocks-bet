@@ -18,10 +18,21 @@ model User {
   isAdmin        Boolean   @default(false)
   isTemporaryPwd Boolean   @default(false)
   limitMultiplier Float    @default(1.0) // 1.0 = 100%, 0.5 = 50%, etc.
+  lastSpinTime   DateTime?
   createdAt      DateTime  @default(now())
   updatedAt      DateTime  @updatedAt
   bets           Bet[]
   messages       Message[]
+  bonuses        Bonus[]
+}
+
+model Bonus {
+  id          String   @id @default(cuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  description String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 }
 
 model Sport {

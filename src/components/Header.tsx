@@ -54,6 +54,12 @@ export function Header() {
               <Link href="/history" className="text-sm bg-zinc-800 hover:bg-zinc-700 px-3 py-1.5 rounded text-zinc-300 font-semibold">
                 My Bets
               </Link>
+              <Link href="/spin" className="text-sm bg-gradient-to-r from-green-600 to-green-500 hover:from-green-500 hover:to-green-400 px-3 py-1.5 rounded text-white font-bold animate-pulse">
+                Free Spin
+              </Link>
+              <Link href="/bonuses" className="text-sm bg-zinc-800 hover:bg-zinc-700 px-3 py-1.5 rounded text-zinc-300 font-semibold">
+                Bonuses
+              </Link>
               <Link href="/support" className="text-sm bg-zinc-800 hover:bg-zinc-700 px-3 py-1.5 rounded text-zinc-300 font-semibold">
                 Support
               </Link>
@@ -112,6 +118,12 @@ export function Header() {
               </div>
               <Link href="/history" onClick={() => setIsMenuOpen(false)} className="w-full text-center text-sm bg-zinc-800 hover:bg-zinc-700 py-3 rounded text-white font-semibold">
                 My Bets
+              </Link>
+              <Link href="/spin" onClick={() => setIsMenuOpen(false)} className="w-full text-center text-sm bg-gradient-to-r from-green-600 to-green-500 py-3 rounded text-white font-black animate-pulse">
+                Free Spin
+              </Link>
+              <Link href="/bonuses" onClick={() => setIsMenuOpen(false)} className="w-full text-center text-sm bg-zinc-800 hover:bg-zinc-700 py-3 rounded text-white font-semibold">
+                My Bonuses
               </Link>
               <Link href="/support" onClick={() => setIsMenuOpen(false)} className="w-full text-center text-sm bg-zinc-800 hover:bg-zinc-700 py-3 rounded text-white font-semibold">
                 Support
