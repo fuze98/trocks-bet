@@ -117,3 +117,21 @@ export async function createOutcome(formData: FormData) {
 
   revalidatePath(`/admin/matches`);
 }
+
+export async function updateMatchStartTime(matchId: string, startTime: string) {
+  await prisma.match.update({
+    where: { id: matchId },
+    data: { startTime: new Date(startTime) },
+  });
+  revalidatePath("/admin/matches");
+  revalidatePath("/");
+}
+
+export async function updateOutcomeOdds(outcomeId: string, oddsDecimal: number) {
+  await prisma.marketOutcome.update({
+    where: { id: outcomeId },
+    data: { oddsDecimal },
+  });
+  revalidatePath("/admin/matches");
+  revalidatePath("/");
+}

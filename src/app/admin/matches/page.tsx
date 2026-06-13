@@ -1,5 +1,5 @@
 import { prisma } from "@/lib/prisma";
-import { createMatch, updateMatchStatus, deleteMatch, createMarket, createOutcome } from "../actions";
+import { createMatch, updateMatchStatus, deleteMatch, createMarket, createOutcome, updateMatchStartTime, updateOutcomeOdds } from "../actions";
 
 export default async function MatchesAdmin() {
   const leagues = await prisma.league.findMany({
@@ -56,12 +56,27 @@ export default async function MatchesAdmin() {
               <div>
                 <div className="text-sm text-zinc-400 mb-1">{match.league.sport.name} &gt; {match.league.name}</div>
                 <h3 className="text-2xl font-bold text-white">{match.name}</h3>
-                <div className="text-sm text-zinc-400 mt-1">Starts: {new Date(match.startTime).toLocaleString()}</div>
-                <div className="text-sm text-zinc-400">Status: <span className="text-green-400">{match.status}</span></div>
+
+                {/* Editable Start Time */}
+                <form action={async (formData: FormData) => {
+                  "use server";
+                  await updateMatchStartTime(match.id, formData.get("startTime") as string);
+                }} className="flex items-center gap-2 mt-2">
+                  <label className="text-sm text-zinc-400">Starts:</label>
+                  <input
+                    type="datetime-local"
+                    name="startTime"
+                    defaultValue={new Date(match.startTime.getTime() - match.startTime.getTimezoneOffset() * 60000).toISOString().slice(0,16)}
+                    required
+                    className="rounded border-0 bg-zinc-800 py-1 px-2 text-sm text-white focus:ring-1 focus:ring-green-500"
+                  />
+                  <button type="submit" className="bg-zinc-700 hover:bg-zinc-600 text-white px-2 py-1 rounded text-xs">Update Time</button>
+                </form>
+
+                <div className="text-sm text-zinc-400 mt-2">Status: <span className="text-green-400">{match.status}</span></div>
               </div>
 
               <div className="flex gap-2">
-                 {/* Status toggles could go here, for now simple delete */}
                  <form action={deleteMatch.bind(null, match.id)}>
                   <button type="submit" className="text-red-500 hover:text-red-400 text-sm bg-red-500/10 px-3 py-1 rounded">Delete Match</button>
                 </form>
@@ -83,9 +98,24 @@ export default async function MatchesAdmin() {
 
                     <div className="space-y-2 mb-4">
                       {market.outcomes.map(outcome => (
-                        <div key={outcome.id} className="flex justify-between text-sm bg-zinc-800 p-2 rounded">
-                          <span className="text-zinc-300">{outcome.name}</span>
-                          <span className="font-mono text-green-400">{outcome.oddsDecimal.toFixed(2)}</span>
+                        <div key={outcome.id} className="flex flex-col sm:flex-row sm:items-center justify-between text-sm bg-zinc-800 p-2 rounded gap-2">
+                          <span className="text-zinc-300 font-medium">{outcome.name}</span>
+
+                          {/* Editable Odds */}
+                          <form action={async (formData: FormData) => {
+                            "use server";
+                            await updateOutcomeOdds(outcome.id, parseFloat(formData.get("odds") as string));
+                          }} className="flex gap-2 items-center">
+                            <input
+                              type="number"
+                              step="0.01"
+                              name="odds"
+                              defaultValue={outcome.oddsDecimal}
+                              required
+                              className="w-20 rounded border-0 bg-zinc-900 py-1 px-2 text-sm text-green-400 font-mono text-right focus:ring-1 focus:ring-green-500"
+                            />
+                            <button type="submit" className="bg-zinc-700 hover:bg-zinc-600 text-white px-2 py-1 rounded text-xs">Update Odds</button>
+                          </form>
                         </div>
                       ))}
                     </div>
