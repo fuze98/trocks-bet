@@ -50,6 +50,12 @@ export default async function AdminLayout({
             Users & Grading
           </Link>
           <Link
+            href="/admin/support"
+            className="px-3 py-2 rounded-md hover:bg-zinc-800 text-zinc-300 font-medium"
+          >
+            Customer Support
+          </Link>
+          <Link
             href="/"
             className="px-3 py-2 rounded-md hover:bg-zinc-800 text-zinc-500 font-medium mt-auto"
           >

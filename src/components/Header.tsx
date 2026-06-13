@@ -26,9 +26,9 @@ export function Header() {
 
   return (
     <>
-      <header className="h-16 bg-zinc-900 border-b border-zinc-800 flex items-center justify-between px-4 md:px-6 sticky top-0 z-50">
+      <header className="h-16 bg-zinc-950 border-b border-zinc-800/50 flex items-center justify-between px-4 md:px-6 sticky top-0 z-50 shadow-sm backdrop-blur-sm bg-opacity-80">
         <Link href="/" className="flex items-center gap-2">
-          <span className="text-3xl">🚜</span>
+          <span className="text-3xl drop-shadow-[0_0_8px_rgba(34,197,94,0.3)]">🛻</span>
           <span className="text-xl font-black text-white tracking-tight">
             Trocks<span className="text-green-500">Bet</span>
           </span>
@@ -54,11 +54,9 @@ export function Header() {
               <Link href="/history" className="text-sm bg-zinc-800 hover:bg-zinc-700 px-3 py-1.5 rounded text-zinc-300 font-semibold">
                 My Bets
               </Link>
-              {!(session.user as any).isAdmin && (
-                <Link href="/support" className="text-sm bg-zinc-800 hover:bg-zinc-700 px-3 py-1.5 rounded text-zinc-300 font-semibold">
-                  Support
-                </Link>
-              )}
+              <Link href="/support" className="text-sm bg-zinc-800 hover:bg-zinc-700 px-3 py-1.5 rounded text-zinc-300 font-semibold">
+                Support
+              </Link>
               {(session.user as any).isAdmin && (
                 <Link href="/admin" className="text-sm bg-zinc-800 hover:bg-zinc-700 px-3 py-1.5 rounded text-zinc-300">
                   Admin
@@ -115,11 +113,9 @@ export function Header() {
               <Link href="/history" onClick={() => setIsMenuOpen(false)} className="w-full text-center text-sm bg-zinc-800 hover:bg-zinc-700 py-3 rounded text-white font-semibold">
                 My Bets
               </Link>
-              {!(session.user as any).isAdmin && (
-                <Link href="/support" onClick={() => setIsMenuOpen(false)} className="w-full text-center text-sm bg-zinc-800 hover:bg-zinc-700 py-3 rounded text-white font-semibold">
-                  Customer Service
-                </Link>
-              )}
+              <Link href="/support" onClick={() => setIsMenuOpen(false)} className="w-full text-center text-sm bg-zinc-800 hover:bg-zinc-700 py-3 rounded text-white font-semibold">
+                Support
+              </Link>
               {(session.user as any).isAdmin && (
                 <Link href="/admin" onClick={() => setIsMenuOpen(false)} className="w-full text-center text-sm bg-zinc-800 hover:bg-zinc-700 py-3 rounded text-white font-semibold">
                   Admin Panel
