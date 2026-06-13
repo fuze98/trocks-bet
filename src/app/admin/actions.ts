@@ -81,6 +81,7 @@ export async function deleteMatch(id: string) {
 export async function createMarket(formData: FormData) {
   const name = formData.get("name") as string;
   const matchId = formData.get("matchId") as string;
+  const type = formData.get("type") as string;
   const allowOnlySingles = formData.get("allowOnlySingles") === "on";
 
   if (!name || !matchId) return;
@@ -89,6 +90,7 @@ export async function createMarket(formData: FormData) {
     data: {
       name,
       matchId,
+      type: type || null,
       allowOnlySingles,
       status: "Open"
     }

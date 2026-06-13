@@ -38,6 +38,12 @@ export default async function AdminLayout({
             Matches & Markets
           </Link>
           <Link
+            href="/admin/liabilities"
+            className="px-3 py-2 rounded-md hover:bg-zinc-800 text-zinc-300 font-medium"
+          >
+            Liabilities & Exposure
+          </Link>
+          <Link
             href="/admin/users"
             className="px-3 py-2 rounded-md hover:bg-zinc-800 text-zinc-300 font-medium"
           >

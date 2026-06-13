@@ -7,6 +7,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { ChevronUp, ChevronDown, Trash2 } from "lucide-react";
+import toast from "react-hot-toast";
 
 export function BetSlip() {
   const { legs, riskAmount, oddsFormat, removeLeg, clearSlip, setRiskAmount } = useBetSlip();
@@ -59,14 +60,19 @@ export function BetSlip() {
 
       if (!res.ok) {
         setError(data.error || "Failed to place bet");
+        toast.error(data.error || "Failed to place bet");
       } else {
+        toast.success("Bet placed successfully!");
         clearSlip();
         setIsOpenMobile(false);
-        // Refresh to update balance and ui
-        window.location.reload();
+        // Add a slight delay before reloading so user can see success toast
+        setTimeout(() => {
+          window.location.reload();
+        }, 1500);
       }
     } catch (err) {
       setError("An unexpected error occurred.");
+      toast.error("An unexpected error occurred.");
     } finally {
       setIsPlacing(false);
     }
