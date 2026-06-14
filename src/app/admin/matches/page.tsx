@@ -2,7 +2,9 @@ import { prisma } from "@/lib/prisma";
 import { createMatch, updateMatchStatus, deleteMatch, createMarket, createOutcome } from "../actions";
 import { AddMarketFromTemplate } from "@/components/AddMarketFromTemplate";
 
-export default async function MatchesAdmin() {
+export default async function MatchesAdmin({ searchParams }: { searchParams: { tab?: string } }) {
+  const activeTab = searchParams.tab || "active";
+
   const leagues = await prisma.league.findMany({
     include: {
       sport: true,
@@ -12,6 +14,9 @@ export default async function MatchesAdmin() {
   });
 
   const matches = await prisma.match.findMany({
+    where: {
+      status: activeTab === "completed" ? "Completed" : { not: "Completed" }
+    },
     include: {
       league: { include: { sport: true } },
       homeTeam: true,
@@ -77,6 +82,11 @@ export default async function MatchesAdmin() {
         </div>
       </div>
 
+      <div className="flex gap-4 border-b border-zinc-800 pb-4 mb-6">
+        <a href="/admin/matches?tab=active" className={`px-4 py-2 rounded-full text-sm font-bold ${activeTab !== "completed" ? "bg-green-500 text-black" : "bg-zinc-800 text-zinc-400 hover:text-white"}`}>Active Matches</a>
+        <a href="/admin/matches?tab=completed" className={`px-4 py-2 rounded-full text-sm font-bold ${activeTab === "completed" ? "bg-green-500 text-black" : "bg-zinc-800 text-zinc-400 hover:text-white"}`}>Completed</a>
+      </div>
+
       <div className="space-y-6">
         {matches.map(match => (
           <div key={match.id} className="bg-zinc-900 border border-zinc-800 rounded-xl p-6">
@@ -103,8 +113,16 @@ export default async function MatchesAdmin() {
                 <div className="text-sm text-zinc-400">Status: <span className="text-green-400">{match.status}</span></div>
               </div>
 
-              <div className="flex gap-2">
-                 {/* Status toggles could go here, for now simple delete */}
+              <div className="flex gap-2 items-start">
+                <form action={async () => {
+                  "use server";
+                  const { updateMatchStatus } = await import('../actions');
+                  await updateMatchStatus(match.id, match.status === "Completed" ? "Scheduled" : "Completed");
+                }}>
+                  <button type="submit" className="text-zinc-300 hover:text-white text-sm bg-zinc-700 hover:bg-zinc-600 px-3 py-1 rounded transition-colors mr-2">
+                    {match.status === "Completed" ? "Mark Active" : "Mark Completed"}
+                  </button>
+                </form>
                  <form action={deleteMatch.bind(null, match.id)}>
                   <button type="submit" className="text-red-500 hover:text-red-400 text-sm bg-red-500/10 px-3 py-1 rounded transition-colors">Delete Match</button>
                 </form>

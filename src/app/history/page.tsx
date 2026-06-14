@@ -5,6 +5,7 @@ import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { formatOdds } from "@/lib/utils";
 import { useBetSlip } from "@/store/useBetSlip";
+import { toast } from "react-hot-toast";
 
 type BetHistory = {
   id: string;
@@ -92,20 +93,54 @@ export default function HistoryPage() {
               {/* Header */}
               <div className="p-4 border-b border-zinc-800 bg-zinc-950/50 flex justify-between items-center">
                 <div>
-                  <div className="text-xs text-zinc-500 mb-1">
-                    {new Date(bet.createdAt).toLocaleString()}
+                  <div className="text-xs text-zinc-500 mb-1 flex items-center gap-2">
+                    <span>{new Date(bet.createdAt).toLocaleString()}</span>
+                    <span className="bg-zinc-800 text-zinc-400 px-1.5 py-0.5 rounded text-[10px] font-mono">
+                      #{bet.id.slice(0, 8).toUpperCase()}
+                    </span>
                   </div>
                   <div className="font-bold text-white uppercase text-sm tracking-wider">
                     {bet.legs.length === 1 ? 'Single Bet' : `${bet.legs.length}-Leg Parlay`}
                   </div>
                 </div>
-                <div className={`px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider ${
-                  bet.status === 'Won' ? 'bg-green-500/20 text-green-500' :
-                  bet.status === 'Lost' ? 'bg-red-500/20 text-red-500' :
-                  bet.status === 'Push' ? 'bg-zinc-500/20 text-zinc-400' :
-                  'bg-yellow-500/20 text-yellow-500'
-                }`}>
-                  {bet.status}
+                <div className="flex items-center gap-2">
+                  {bet.status === 'Pending' && (
+                    <button
+                      onClick={async () => {
+                        const confirmCashout = confirm(`Are you sure you want to cashout? Due to algorithmic adjustments, we can offer you $${(bet.amount * 0.1).toFixed(2)} for this ticket.`);
+                        if (!confirmCashout) return;
+
+                        try {
+                          const res = await fetch('/api/bets/cashout', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ betId: bet.id })
+                          });
+                          const data = await res.json();
+                          if (data.success) {
+                            toast.success(`Cashed out for $${data.cashoutAmount.toFixed(2)}`);
+                            setBets(bets.map(b => b.id === bet.id ? { ...b, status: 'Cashed Out' } : b));
+                          } else {
+                            toast.error(data.error);
+                          }
+                        } catch (error) {
+                          toast.error('Cashout failed');
+                        }
+                      }}
+                      className="px-3 py-1 bg-green-500/10 hover:bg-green-500/20 text-green-500 border border-green-500/20 rounded-full text-xs font-bold uppercase tracking-wider transition-colors"
+                    >
+                      Cashout ${(bet.amount * 0.1).toFixed(2)}
+                    </button>
+                  )}
+                  <div className={`px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider ${
+                    bet.status === 'Won' ? 'bg-green-500/20 text-green-500' :
+                    bet.status === 'Lost' ? 'bg-red-500/20 text-red-500' :
+                    bet.status === 'Push' ? 'bg-zinc-500/20 text-zinc-400' :
+                    bet.status === 'Cashed Out' ? 'bg-blue-500/20 text-blue-400' :
+                    'bg-yellow-500/20 text-yellow-500'
+                  }`}>
+                    {bet.status}
+                  </div>
                 </div>
               </div>
 
@@ -159,6 +194,7 @@ export default function HistoryPage() {
                   <div className="font-mono font-bold text-white">
                     {bet.status === 'Won' ? `$${bet.potentialWin.toFixed(2)}` :
                      bet.status === 'Push' ? `$${bet.amount.toFixed(2)}` :
+                     bet.status === 'Cashed Out' ? `$${(bet.amount * 0.1).toFixed(2)}` :
                      bet.status === 'Lost' ? '$0.00' :
                      '-'}
                   </div>

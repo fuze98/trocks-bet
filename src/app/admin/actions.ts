@@ -262,9 +262,25 @@ export async function createMarketFromTemplate(formData: FormData) {
       let text = fmt;
       text = text.replace("{home}", match.homeTeam?.name || "Home Team");
       text = text.replace("{away}", match.awayTeam?.name || "Away Team");
-      text = text.replace("{line}", line ? (Number(line) > 0 && text.includes("Spread") ? `+${line}` : line) : "");
-      text = text.replace("{inverse_line}", line ? (Number(line) * -1 > 0 ? `+${Number(line) * -1}` : String(Number(line) * -1)) : "");
-      text = text.replace("{player}", player || "");
+
+      // Better line handling logic
+      const lineNum = Number(line);
+      const isSpread = template.name.toLowerCase().includes("spread");
+
+      let lineStr = "";
+      if (line) {
+        lineStr = (lineNum > 0 && isSpread) ? `+${lineNum}` : `${lineNum}`;
+      }
+
+      let inverseLineStr = "";
+      if (line) {
+        const invLineNum = lineNum * -1;
+        inverseLineStr = (invLineNum > 0) ? `+${invLineNum}` : `${invLineNum}`;
+      }
+
+      text = text.replace(/{line}/g, lineStr);
+      text = text.replace(/{inverse_line}/g, inverseLineStr);
+      text = text.replace(/{player}/g, player || "");
 
       return {
         name: text.trim(),

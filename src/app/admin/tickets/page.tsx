@@ -5,6 +5,7 @@ export const revalidate = 0; // Disable static caching for live ticker feed
 
 export default async function TicketsAdmin() {
   const bets = await prisma.bet.findMany({
+    where: { status: "Pending" },
     include: {
       user: true,
       legs: {
@@ -42,7 +43,12 @@ export default async function TicketsAdmin() {
 
                 {/* Customer Info Column */}
                 <div className="md:w-1/4 border-b md:border-b-0 md:border-r border-zinc-800 pb-4 md:pb-0 pr-4">
-                  <div className="text-xs font-bold text-zinc-500 uppercase tracking-widest mb-2">Customer</div>
+                  <div className="text-xs font-bold text-zinc-500 uppercase tracking-widest mb-2 flex justify-between">
+                    <span>Customer</span>
+                    <span className="bg-zinc-800 text-zinc-400 px-1.5 py-0.5 rounded text-[10px] font-mono">
+                      #{bet.id.slice(0, 8).toUpperCase()}
+                    </span>
+                  </div>
                   <div className="font-bold text-lg text-white mb-1">{bet.user.username}</div>
                   <div className="text-sm font-mono text-green-400 mb-2">Balance: ${bet.user.balance.toFixed(2)}</div>
                   <div className="text-xs text-zinc-500">Limit Multiplier: {bet.user.limitMultiplier}x</div>

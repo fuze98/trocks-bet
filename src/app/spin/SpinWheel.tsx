@@ -107,31 +107,68 @@ export default function SpinWheel() {
         {/* Pointer */}
         <div className="absolute top-0 left-1/2 -translate-x-1/2 -mt-4 z-10 w-0 h-0 border-l-[15px] border-l-transparent border-r-[15px] border-r-transparent border-t-[30px] border-white drop-shadow-md" />
 
-        {/* Wheel */}
+        {/* Wheel (SVG) */}
         <motion.div
-          className="w-full h-full rounded-full overflow-hidden border-4 border-zinc-800 shadow-2xl relative"
+          className="w-full h-full rounded-full overflow-hidden shadow-2xl relative"
           animate={{ rotate: rotation }}
           transition={{ duration: 5, ease: [0.1, 0.7, 0.1, 1] }}
         >
-          {PRIZES.map((prize, i) => {
-            const angle = i * (360 / PRIZES.length);
-            return (
-              <div
-                key={prize.id}
-                className={`absolute w-1/2 h-1/2 origin-bottom-right flex items-center justify-center p-4 ${prize.color}`}
-                style={{
-                  transform: `rotate(${angle}deg) skewY(-30deg)`, // Skew for 60 degree slice
-                }}
-              >
-                <div
-                  className={`transform skewY(30deg) rotate(30deg) ${prize.text} font-bold text-xs sm:text-sm text-center max-w-[80px] break-words`}
-                  style={{ transformOrigin: 'center center' }}
-                >
-                  {prize.name}
-                </div>
-              </div>
-            );
-          })}
+          <svg viewBox="0 0 100 100" className="w-full h-full rounded-full border-4 border-zinc-800">
+            {PRIZES.map((prize, i) => {
+              const numSlices = PRIZES.length;
+              const anglePerSlice = 360 / numSlices;
+              // Path definition for a slice
+              const startAngle = i * anglePerSlice - 90; // -90 starts at top
+              const endAngle = startAngle + anglePerSlice;
+              const x1 = 50 + 50 * Math.cos((Math.PI * startAngle) / 180);
+              const y1 = 50 + 50 * Math.sin((Math.PI * startAngle) / 180);
+              const x2 = 50 + 50 * Math.cos((Math.PI * endAngle) / 180);
+              const y2 = 50 + 50 * Math.sin((Math.PI * endAngle) / 180);
+
+              const fillColors = [
+                "#22c55e", // green-500
+                "#3b82f6", // blue-500
+                "#a855f7", // purple-500
+                "#eab308", // yellow-500
+                "#ef4444", // red-500
+                "#dc2626", // red-600
+              ];
+
+              // Calculate text placement
+              const textAngle = startAngle + (anglePerSlice / 2);
+              const textX = 50 + 35 * Math.cos((Math.PI * textAngle) / 180);
+              const textY = 50 + 35 * Math.sin((Math.PI * textAngle) / 180);
+
+              return (
+                <g key={prize.id}>
+                  <path
+                    d={`M50,50 L${x1},${y1} A50,50 0 0,1 ${x2},${y2} Z`}
+                    fill={fillColors[i]}
+                    stroke="#27272a"
+                    strokeWidth="0.5"
+                  />
+                  <text
+                    x={textX}
+                    y={textY}
+                    fill={prize.text === "text-white" ? "#ffffff" : "#000000"}
+                    fontSize="4.5"
+                    fontWeight="bold"
+                    textAnchor="middle"
+                    dominantBaseline="middle"
+                    transform={`rotate(${textAngle + 90}, ${textX}, ${textY})`}
+                    style={{ whiteSpace: "pre-line" }}
+                  >
+                    {/* Hacky way to wrap text in SVG - limit character lengths or use tspans */}
+                    {prize.name.split(" ").map((word, wIdx) => (
+                      <tspan x={textX} dy={wIdx === 0 ? "-0.5em" : "1.2em"} key={wIdx}>
+                        {word}
+                      </tspan>
+                    ))}
+                  </text>
+                </g>
+              );
+            })}
+          </svg>
         </motion.div>
       </div>
 

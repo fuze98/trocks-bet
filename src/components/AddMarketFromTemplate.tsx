@@ -84,9 +84,25 @@ export function AddMarketFromTemplate({ templates, match }: { templates: Templat
                 let text = fmt;
                 text = text.replace("{home}", match.homeTeam?.name || "Home Team");
                 text = text.replace("{away}", match.awayTeam?.name || "Away Team");
-                text = text.replace("{line}", line ? (Number(line) > 0 && text.includes("Spread") ? `+${line}` : line) : "{line}");
-                text = text.replace("{inverse_line}", line ? (Number(line) * -1 > 0 ? `+${Number(line) * -1}` : String(Number(line) * -1)) : "{inverse_line}");
-                text = text.replace("{player}", player || "{player}");
+
+                const lineNum = Number(line);
+                const isSpread = selectedTemplate.name.toLowerCase().includes("spread");
+
+                let lineStr = "{line}";
+                if (line) {
+                  lineStr = (lineNum > 0 && isSpread) ? `+${lineNum}` : `${lineNum}`;
+                }
+
+                let inverseLineStr = "{inverse_line}";
+                if (line) {
+                  const invLineNum = lineNum * -1;
+                  inverseLineStr = (invLineNum > 0) ? `+${invLineNum}` : `${invLineNum}`;
+                }
+
+                text = text.replace(/{line}/g, lineStr);
+                text = text.replace(/{inverse_line}/g, inverseLineStr);
+                text = text.replace(/{player}/g, player || "{player}");
+
                 return (
                   <span key={i} className="text-[10px] font-mono bg-zinc-800 px-2 py-1 rounded text-green-400 border border-zinc-700">{text}</span>
                 )
