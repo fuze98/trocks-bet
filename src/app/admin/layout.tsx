@@ -24,43 +24,55 @@ export default async function AdminLayout({
             Trocks<span className="text-green-500">Admin</span>
           </span>
         </div>
-        <nav className="flex flex-col gap-2">
-          <Link
-            href="/admin/sports"
-            className="px-3 py-2 rounded-md hover:bg-zinc-800 text-zinc-300 font-medium"
-          >
-            Sports & Leagues
-          </Link>
-          <Link
-            href="/admin/matches"
-            className="px-3 py-2 rounded-md hover:bg-zinc-800 text-zinc-300 font-medium"
-          >
-            Matches & Markets
-          </Link>
-          <Link
-            href="/admin/liabilities"
-            className="px-3 py-2 rounded-md hover:bg-zinc-800 text-zinc-300 font-medium"
-          >
-            Liabilities & Exposure
-          </Link>
-          <Link
-            href="/admin/users"
-            className="px-3 py-2 rounded-md hover:bg-zinc-800 text-zinc-300 font-medium"
-          >
-            Users & Grading
-          </Link>
-          <Link
-            href="/admin/support"
-            className="px-3 py-2 rounded-md hover:bg-zinc-800 text-zinc-300 font-medium"
-          >
-            Customer Support
-          </Link>
-          <Link
-            href="/"
-            className="px-3 py-2 rounded-md hover:bg-zinc-800 text-zinc-500 font-medium mt-auto"
-          >
-            Back to site
-          </Link>
+        <nav className="flex flex-col gap-4 overflow-y-auto">
+          <div>
+            <div className="text-xs font-bold text-zinc-500 uppercase tracking-wider mb-2 px-3">Live Action</div>
+            <Link href="/admin/tickets" className="block px-3 py-2 rounded-md hover:bg-zinc-800 text-zinc-300 font-medium text-sm">
+              Live Ticket Feed
+            </Link>
+            <Link href="/admin/alarms" className="block px-3 py-2 rounded-md hover:bg-zinc-800 text-zinc-300 font-medium text-sm">
+              Market Alarms
+            </Link>
+          </div>
+
+          <div>
+            <div className="text-xs font-bold text-zinc-500 uppercase tracking-wider mb-2 px-3">Bookmaking</div>
+            <Link href="/admin/sports" className="block px-3 py-2 rounded-md hover:bg-zinc-800 text-zinc-300 font-medium text-sm">
+              Sports & Leagues
+            </Link>
+            <Link href="/admin/matches" className="block px-3 py-2 rounded-md hover:bg-zinc-800 text-zinc-300 font-medium text-sm">
+              Matches & Markets
+            </Link>
+            <Link href="/admin/templates" className="block px-3 py-2 rounded-md hover:bg-zinc-800 text-zinc-300 font-medium text-sm">
+              Market Templates
+            </Link>
+            <Link href="/admin/liabilities" className="block px-3 py-2 rounded-md hover:bg-zinc-800 text-zinc-300 font-medium text-sm">
+              Liabilities & Exposure
+            </Link>
+          </div>
+
+          <div>
+            <div className="text-xs font-bold text-zinc-500 uppercase tracking-wider mb-2 px-3">Accounting</div>
+            <Link href="/admin/stats" className="block px-3 py-2 rounded-md hover:bg-zinc-800 text-zinc-300 font-medium text-sm">
+              Stats & P&L Dashboard
+            </Link>
+            <Link href="/admin/users" className="block px-3 py-2 rounded-md hover:bg-zinc-800 text-zinc-300 font-medium text-sm">
+              Users & Grading
+            </Link>
+          </div>
+
+          <div>
+            <div className="text-xs font-bold text-zinc-500 uppercase tracking-wider mb-2 px-3">Support</div>
+            <Link href="/admin/support" className="block px-3 py-2 rounded-md hover:bg-zinc-800 text-zinc-300 font-medium text-sm">
+              Support Hub
+            </Link>
+          </div>
+
+          <div className="mt-auto">
+            <Link href="/" className="block px-3 py-2 rounded-md hover:bg-zinc-800 text-zinc-500 font-medium text-sm">
+              Back to site
+            </Link>
+          </div>
         </nav>
       </div>
 

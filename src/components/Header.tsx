@@ -51,6 +51,12 @@ export function Header() {
                   {balance !== null ? `$${balance.toFixed(2)} SCC` : '...'}
                 </span>
               </div>
+              <Link href="/spin" className="text-sm bg-blue-600 hover:bg-blue-500 px-3 py-1.5 rounded text-white font-bold shadow-[0_0_10px_rgba(37,99,235,0.5)]">
+                SPIN WHEEL
+              </Link>
+              <Link href="/bonuses" className="text-sm bg-zinc-800 hover:bg-zinc-700 px-3 py-1.5 rounded text-zinc-300 font-semibold">
+                Bonuses
+              </Link>
               <Link href="/history" className="text-sm bg-zinc-800 hover:bg-zinc-700 px-3 py-1.5 rounded text-zinc-300 font-semibold">
                 My Bets
               </Link>
@@ -110,6 +116,12 @@ export function Header() {
                   {balance !== null ? `$${balance.toFixed(2)}` : '...'}
                 </span>
               </div>
+              <Link href="/spin" onClick={() => setIsMenuOpen(false)} className="w-full text-center text-sm bg-blue-600 hover:bg-blue-500 py-3 rounded text-white font-black">
+                SPIN DAILY WHEEL
+              </Link>
+              <Link href="/bonuses" onClick={() => setIsMenuOpen(false)} className="w-full text-center text-sm bg-zinc-800 hover:bg-zinc-700 py-3 rounded text-white font-semibold">
+                My Bonuses
+              </Link>
               <Link href="/history" onClick={() => setIsMenuOpen(false)} className="w-full text-center text-sm bg-zinc-800 hover:bg-zinc-700 py-3 rounded text-white font-semibold">
                 My Bets
               </Link>

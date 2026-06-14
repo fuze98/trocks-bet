@@ -19,6 +19,8 @@ export default async function Home({
     },
     include: {
       league: { include: { sport: true } },
+      homeTeam: true,
+      awayTeam: true,
       markets: {
         where: { status: "Open" },
         include: { outcomes: { where: { status: "Pending" } } }

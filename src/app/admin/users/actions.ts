@@ -17,6 +17,19 @@ export async function updateUserBalance(userId: string, formData: FormData) {
   revalidatePath("/admin/users");
 }
 
+export async function updateUserLimit(userId: string, formData: FormData) {
+  const multiplierStr = formData.get("limitMultiplier") as string;
+  if (!multiplierStr) return;
+  const limitMultiplier = parseFloat(multiplierStr);
+
+  await prisma.user.update({
+    where: { id: userId },
+    data: { limitMultiplier },
+  });
+
+  revalidatePath("/admin/users");
+}
+
 export async function resetUserPassword(userId: string) {
   const tempPassword = "trocksbet" + Math.floor(Math.random() * 10000);
   const hashedPassword = await bcrypt.hash(tempPassword, 10);

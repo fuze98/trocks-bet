@@ -53,6 +53,15 @@ export async function POST(req: Request) {
         if (outcome.market.allowOnlySingles) {
           hasSinglesOnly = true;
         }
+
+        // Limit checks
+        if (outcome.market.userLimit) {
+           const adjustedLimit = outcome.market.userLimit * user.limitMultiplier;
+           if (amount > adjustedLimit) {
+               throw new Error(`Your wager exceeds your limit of $${adjustedLimit.toFixed(2)} for ${outcome.market.name}`);
+           }
+        }
+
         if (matchIds.has(outcome.market.match.id)) {
            throw new Error("Cannot parlay multiple outcomes from the same match");
         }
