@@ -1,5 +1,5 @@
 import { prisma } from "@/lib/prisma";
-import { updateUserBalance, gradeMarket } from "./actions";
+import { updateUserBalance, updateUserLimit, gradeMarket } from "./actions";
 import { ResetPasswordButton } from "./ResetPasswordButton";
 
 export default async function UsersAdmin() {
@@ -83,20 +83,37 @@ export default async function UsersAdmin() {
                   </div>
                 </div>
 
-                <div className="text-right">
-                  <div className="text-sm text-zinc-400 mb-1">Social Credit Capital</div>
-                  <form action={updateUserBalance.bind(null, user.id)} className="flex items-center gap-2">
-                    <input
-                      type="number"
-                      name="amount"
-                      defaultValue={user.balance}
-                      step="0.01"
-                      className="w-32 rounded bg-zinc-800 border-0 py-1 px-2 text-white font-mono text-right focus:ring-1 focus:ring-green-500"
-                    />
-                    <button type="submit" className="bg-zinc-700 hover:bg-zinc-600 text-white px-3 py-1 rounded text-sm">
-                      Update
-                    </button>
-                  </form>
+                <div className="text-right flex flex-col gap-4">
+                  <div>
+                    <div className="text-sm text-zinc-400 mb-1">Social Credit Capital</div>
+                    <form action={updateUserBalance.bind(null, user.id)} className="flex items-center gap-2 justify-end">
+                      <input
+                        type="number"
+                        name="amount"
+                        defaultValue={user.balance}
+                        step="0.01"
+                        className="w-32 rounded bg-zinc-800 border-0 py-1 px-2 text-white font-mono text-right focus:ring-1 focus:ring-green-500"
+                      />
+                      <button type="submit" className="bg-zinc-700 hover:bg-zinc-600 text-white px-3 py-1 rounded text-sm w-20">
+                        Update
+                      </button>
+                    </form>
+                  </div>
+                  <div>
+                    <div className="text-sm text-zinc-400 mb-1">Bet Limit Multiplier (e.g. 1.0 = 100%)</div>
+                    <form action={updateUserLimit.bind(null, user.id)} className="flex items-center gap-2 justify-end">
+                      <input
+                        type="number"
+                        name="limitMultiplier"
+                        defaultValue={user.limitMultiplier}
+                        step="0.1"
+                        className="w-32 rounded bg-zinc-800 border-0 py-1 px-2 text-white font-mono text-right focus:ring-1 focus:ring-blue-500"
+                      />
+                      <button type="submit" className="bg-zinc-700 hover:bg-zinc-600 text-white px-3 py-1 rounded text-sm w-20">
+                        Set
+                      </button>
+                    </form>
+                  </div>
                 </div>
               </div>
 

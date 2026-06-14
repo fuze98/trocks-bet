@@ -22,7 +22,9 @@ type Market = {
 type MatchCardProps = {
   match: {
     id: string;
-    name: string;
+    name: string | null;
+    homeTeam?: { name: string } | null;
+    awayTeam?: { name: string } | null;
     startTime: Date;
     status: string;
     league: { name: string; sport: { name: string } };
@@ -33,6 +35,7 @@ type MatchCardProps = {
 import { motion } from "framer-motion";
 
 export function MatchCard({ match }: MatchCardProps) {
+  const matchName = match.name || (match.homeTeam && match.awayTeam ? `${match.homeTeam.name} vs ${match.awayTeam.name}` : "Unknown Match");
   const { legs, addLeg, removeLeg, oddsFormat } = useBetSlip();
 
   const isStarted = new Date() >= new Date(match.startTime) || match.status !== "Scheduled";
@@ -52,7 +55,7 @@ export function MatchCard({ match }: MatchCardProps) {
           <div className="text-xs text-zinc-500 uppercase tracking-wider mb-1">
             {match.league.sport.name} &bull; {match.league.name}
           </div>
-          <h3 className="text-xl font-bold text-white">{match.name}</h3>
+          <h3 className="text-xl font-bold text-white">{matchName}</h3>
           <div className="text-sm text-zinc-400 mt-1">
             {new Date(match.startTime).toLocaleString()}
           </div>
@@ -129,7 +132,7 @@ export function MatchCard({ match }: MatchCardProps) {
                                   addLeg({
                                     id: outcome.id,
                                     matchId: match.id,
-                                    matchName: match.name,
+                                    matchName: matchName,
                                     marketName: market.name,
                                     outcomeName: outcome.name,
                                     oddsDecimal: outcome.oddsDecimal,

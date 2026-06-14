@@ -67,6 +67,26 @@ export default function HistoryPage() {
     );
   }
 
+  const handleCashout = async (betId: string, amount: number) => {
+    try {
+      const res = await fetch("/api/bets/cashout", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ betId })
+      });
+      const data = await res.json();
+
+      if (res.ok) {
+        setBets(bets.map(b => b.id === betId ? { ...b, status: "Cashed Out", potentialWin: data.cashoutAmount } : b));
+        alert(`You successfully cashed out for $${data.cashoutAmount.toFixed(2)} (10% of your wager). Sucker!`);
+      } else {
+        alert(data.error);
+      }
+    } catch (e) {
+      alert("Failed to cashout");
+    }
+  };
+
   if (error) {
     return (
       <div className="p-4 sm:p-8 max-w-4xl mx-auto">
@@ -76,6 +96,9 @@ export default function HistoryPage() {
       </div>
     );
   }
+
+  // Short ID helper
+  const getShortId = (id: string) => `#B-${id.substring(id.length - 4).toUpperCase()}`;
 
   return (
     <div className="p-4 sm:p-8 max-w-4xl mx-auto space-y-6">
@@ -92,17 +115,28 @@ export default function HistoryPage() {
               {/* Header */}
               <div className="p-4 border-b border-zinc-800 bg-zinc-950/50 flex justify-between items-center">
                 <div>
-                  <div className="text-xs text-zinc-500 mb-1">
-                    {new Date(bet.createdAt).toLocaleString()}
+                  <div className="text-xs text-zinc-500 mb-1 flex items-center gap-2">
+                    <span className="font-mono text-zinc-400">{getShortId(bet.id)}</span>
+                    <span>&bull;</span>
+                    <span>{new Date(bet.createdAt).toLocaleString()}</span>
                   </div>
-                  <div className="font-bold text-white uppercase text-sm tracking-wider">
+                  <div className="font-bold text-white uppercase text-sm tracking-wider flex items-center gap-4">
                     {bet.legs.length === 1 ? 'Single Bet' : `${bet.legs.length}-Leg Parlay`}
+                    {bet.status === 'Pending' && (
+                      <button
+                        onClick={() => handleCashout(bet.id, bet.amount)}
+                        className="text-xs bg-green-600 hover:bg-green-500 text-white px-2 py-1 rounded transition ml-4"
+                      >
+                        Cashout ${(bet.amount * 0.10).toFixed(2)}
+                      </button>
+                    )}
                   </div>
                 </div>
                 <div className={`px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider ${
                   bet.status === 'Won' ? 'bg-green-500/20 text-green-500' :
                   bet.status === 'Lost' ? 'bg-red-500/20 text-red-500' :
                   bet.status === 'Push' ? 'bg-zinc-500/20 text-zinc-400' :
+                  bet.status === 'Cashed Out' ? 'bg-blue-500/20 text-blue-400' :
                   'bg-yellow-500/20 text-yellow-500'
                 }`}>
                   {bet.status}
@@ -158,6 +192,7 @@ export default function HistoryPage() {
                   <div className="text-xs text-zinc-500 mb-1">Payout</div>
                   <div className="font-mono font-bold text-white">
                     {bet.status === 'Won' ? `$${bet.potentialWin.toFixed(2)}` :
+                     bet.status === 'Cashed Out' ? `$${bet.potentialWin.toFixed(2)}` :
                      bet.status === 'Push' ? `$${bet.amount.toFixed(2)}` :
                      bet.status === 'Lost' ? '$0.00' :
                      '-'}
