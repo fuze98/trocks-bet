@@ -38,8 +38,8 @@ model Sport {
 model Team {
   id          String   @id @default(cuid())
   name        String
-  sportId     String
-  sport       Sport    @relation(fields: [sportId], references: [id], onDelete: Cascade)
+  sportId     String?
+  sport       Sport?   @relation(fields: [sportId], references: [id], onDelete: Cascade)
   homeMatches Match[]  @relation("HomeTeam")
   awayMatches Match[]  @relation("AwayTeam")
   createdAt   DateTime @default(now())
