@@ -5,6 +5,7 @@ import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { formatOdds } from "@/lib/utils";
 import { useBetSlip } from "@/store/useBetSlip";
+import toast from "react-hot-toast";
 
 type BetHistory = {
   id: string;
@@ -78,12 +79,12 @@ export default function HistoryPage() {
 
       if (res.ok) {
         setBets(bets.map(b => b.id === betId ? { ...b, status: "Cashed Out", potentialWin: data.cashoutAmount } : b));
-        alert(`You successfully cashed out for $${data.cashoutAmount.toFixed(2)} (10% of your wager). Sucker!`);
+        toast.success(`You successfully cashed out for $${data.cashoutAmount.toFixed(2)} (10% of your wager). Sucker!`, { duration: 5000 });
       } else {
-        alert(data.error);
+        toast.error(data.error);
       }
     } catch (e) {
-      alert("Failed to cashout");
+      toast.error("Failed to cashout");
     }
   };
 

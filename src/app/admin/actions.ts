@@ -188,3 +188,29 @@ export async function createOutcome(formData: FormData) {
 
   revalidatePath(`/admin/matches`);
 }
+
+export async function updateMarketStatus(formData: FormData) {
+  const marketId = formData.get("marketId") as string;
+  const status = formData.get("status") as string;
+
+  if (!marketId || !status) return;
+
+  await prisma.market.update({
+    where: { id: marketId },
+    data: { status },
+  });
+
+  revalidatePath("/admin/matches");
+}
+
+export async function deleteMarket(formData: FormData) {
+  const marketId = formData.get("marketId") as string;
+
+  if (!marketId) return;
+
+  await prisma.market.delete({
+    where: { id: marketId },
+  });
+
+  revalidatePath("/admin/matches");
+}

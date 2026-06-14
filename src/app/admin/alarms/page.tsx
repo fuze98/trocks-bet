@@ -1,5 +1,5 @@
 import { prisma } from "@/lib/prisma";
-import { revalidatePath } from "next/cache";
+import { updateMarketLimit, toggleMarketStatus } from "./actions";
 
 export const dynamic = 'force-dynamic';
 
@@ -38,18 +38,6 @@ export default async function AlarmsAdmin() {
     }
   }
 
-  async function suspendMarket(formData: FormData) {
-    "use server";
-    const marketId = formData.get("marketId") as string;
-    if (!marketId) return;
-
-    await prisma.market.update({
-      where: { id: marketId },
-      data: { status: "Suspended" }
-    });
-    revalidatePath("/admin/alarms");
-  }
-
   return (
     <div className="space-y-6">
       <h1 className="text-3xl font-bold text-white mb-6">Market Alarms</h1>
@@ -79,12 +67,22 @@ export default async function AlarmsAdmin() {
                    </div>
                 </div>
               </div>
-              <form action={suspendMarket}>
-                <input type="hidden" name="marketId" value={market.id} />
-                <button type="submit" className="bg-red-600 hover:bg-red-500 text-white font-bold px-6 py-3 rounded shadow-lg transition">
-                  Suspend Market
-                </button>
-              </form>
+              <div className="flex flex-col gap-2 items-end">
+                <form action={updateMarketLimit} className="flex gap-2">
+                  <input type="hidden" name="marketId" value={market.id} />
+                  <input type="number" step="0.01" name="totalLimit" defaultValue={market.totalLimit || ""} className="w-24 rounded bg-red-950 border border-red-800 text-white text-sm px-2 focus:ring-1 focus:ring-red-500 font-mono" placeholder="Limit" />
+                  <button type="submit" className="bg-zinc-800 hover:bg-zinc-700 text-white text-xs px-3 py-1 rounded transition">
+                    Update Limit
+                  </button>
+                </form>
+                <form action={toggleMarketStatus}>
+                  <input type="hidden" name="marketId" value={market.id} />
+                  <input type="hidden" name="status" value="Suspended" />
+                  <button type="submit" className="bg-red-600 hover:bg-red-500 text-white font-bold px-6 py-2 rounded shadow-lg transition w-full">
+                    Suspend Market
+                  </button>
+                </form>
+              </div>
             </div>
           ))}
         </div>

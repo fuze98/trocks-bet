@@ -1,5 +1,5 @@
 import { prisma } from "@/lib/prisma";
-import { createMatch, updateMatchStatus, deleteMatch, createMarket, createOutcome } from "../actions";
+import { createMatch, updateMatchStatus, deleteMatch, createMarket, createOutcome, updateMarketStatus, deleteMarket } from "../actions";
 
 export default async function MatchesAdmin() {
   const leagues = await prisma.league.findMany({
@@ -113,9 +113,40 @@ export default async function MatchesAdmin() {
 
                 {match.markets.map(market => (
                   <div key={market.id} className="bg-zinc-800/50 rounded-lg p-4 border border-zinc-700/50">
-                    <div className="flex justify-between items-center mb-2">
-                      <div className="font-medium text-white">{market.name}</div>
-                      {market.allowOnlySingles && <span className="text-xs bg-yellow-500/20 text-yellow-500 px-2 py-0.5 rounded">Singles Only</span>}
+                    <div className="flex justify-between items-start mb-2">
+                      <div>
+                        <div className="font-medium text-white">{market.name}</div>
+                        <div className="flex gap-2 items-center mt-1">
+                          <span className={`text-xs px-2 py-0.5 rounded uppercase font-bold ${
+                            market.status === 'Open' ? 'bg-green-500/20 text-green-400' :
+                            market.status === 'Suspended' ? 'bg-red-500/20 text-red-400' :
+                            'bg-zinc-500/20 text-zinc-400'
+                          }`}>
+                            {market.status}
+                          </span>
+                          {market.allowOnlySingles && <span className="text-xs bg-yellow-500/20 text-yellow-500 px-2 py-0.5 rounded">Singles Only</span>}
+                        </div>
+                      </div>
+
+                      <div className="flex gap-2">
+                        {market.status === 'Open' ? (
+                          <form action={updateMarketStatus}>
+                            <input type="hidden" name="marketId" value={market.id} />
+                            <input type="hidden" name="status" value="Suspended" />
+                            <button type="submit" className="text-xs bg-red-500/20 hover:bg-red-500/30 text-red-400 px-2 py-1 rounded">Suspend</button>
+                          </form>
+                        ) : market.status === 'Suspended' ? (
+                          <form action={updateMarketStatus}>
+                            <input type="hidden" name="marketId" value={market.id} />
+                            <input type="hidden" name="status" value="Open" />
+                            <button type="submit" className="text-xs bg-green-500/20 hover:bg-green-500/30 text-green-400 px-2 py-1 rounded">Re-Open</button>
+                          </form>
+                        ) : null}
+                        <form action={deleteMarket}>
+                          <input type="hidden" name="marketId" value={market.id} />
+                          <button type="submit" className="text-xs bg-zinc-700 hover:bg-red-900 text-zinc-300 hover:text-white px-2 py-1 rounded">Delete</button>
+                        </form>
+                      </div>
                     </div>
 
                     <div className="space-y-2 mb-4">

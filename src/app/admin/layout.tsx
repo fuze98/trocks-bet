@@ -59,6 +59,9 @@ export default async function AdminLayout({
             <Link href="/admin/users" className="block px-3 py-2 rounded-md hover:bg-zinc-800 text-zinc-300 font-medium text-sm">
               Users & Grading
             </Link>
+            <Link href="/admin/customers" className="block px-3 py-2 rounded-md hover:bg-zinc-800 text-zinc-300 font-medium text-sm">
+              Customer Overview
+            </Link>
           </div>
 
           <div>
