@@ -40,6 +40,8 @@ model Team {
   name        String
   sportId     String?
   sport       Sport?   @relation(fields: [sportId], references: [id], onDelete: Cascade)
+  leagueId    String?
+  league      League?  @relation(fields: [leagueId], references: [id], onDelete: Cascade)
   homeMatches Match[]  @relation("HomeTeam")
   awayMatches Match[]  @relation("AwayTeam")
   createdAt   DateTime @default(now())
@@ -51,6 +53,7 @@ model League {
   name        String
   sportId     String
   sport       Sport    @relation(fields: [sportId], references: [id], onDelete: Cascade)
+  teams       Team[]
   matches     Match[]
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
